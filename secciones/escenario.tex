@@ -1,0 +1,120 @@
+%escenario.tex
+\section{Situación problemática y alternativas de solución}
+
+\subsection{Planteamiento de la situación problemática}
+
+La evolución acelerada de los modelos de inteligencia artificial generativa ha generado un incremento exponencial en el consumo energético de los centros de datos, sin que existan herramientas matemáticas estandarizadas para medirlo y optimizarlo. Esta problemática se manifiesta en cuatro dimensiones críticas:
+
+\begin{enumerate}
+    \item \textbf{Ausencia de medición precisa en inferencia:} La mayoría de estudios se enfocan en el entrenamiento de modelos, dejando un vacío en la cuantificación del consumo real durante la inferencia. Sin métricas precisas, es imposible comparar eficiencia entre sistemas o tomar decisiones informadas sobre su uso.
+    
+    \item \textbf{Falta de estándares de comparación:} No existen métricas universales y reproducibles (tokens/Wh, inferencias/Joule) que permitan comparar objetivamente la eficiencia energética entre diferentes modelos de IA. Esta ausencia obstaculiza tanto la selección de modelos como la optimización de infraestructura.
+    
+    \item \textbf{Escalamiento sin control metodológico:} El crecimiento exponencial en adopción de LLMs genera demandas energéticas sin metodologías confiables de medición y predicción. Empresas como OpenAI han enfrentado limitaciones de capacidad al expandir sus servicios, evidenciando la necesidad de herramientas cuantitativas precisas.
+    
+    \item \textbf{Marco matemático inexistente:} La literatura actual carece de modelos matemáticos rigurosos basados en cálculo integral que permitan caracterizar el consumo como función del tiempo o volumen de computación, obstaculizando tanto la medición como la optimización sistemática.
+\end{enumerate}
+
+Abordar esta problemática requiere desarrollar un framework matemático riguroso que cuantifique y optimice consumo energético mediante herramientas de cálculo integral.
+
+\subsection{Framework Matemático Propuesto}
+
+El corazón de esta propuesta radica en aplicar sistemáticamente el cálculo integral para transformar el problema de consumo energético en un modelo matemático concreto. La Tabla~\ref{tab:framework} presenta la correspondencia entre los conceptos indicados en el curso de Cálculo Integral y su aplicación específica a nuestro escenario:
+
+\begin{table}[H]
+    \centering
+    \caption{Correspondencia entre conceptos de C\'{a}lculo Integral y su aplicaci\'{o}n en medici\'{o}n de consumo energetico de modelos de IA.}
+    \label{tab:framework}
+    \begin{tabular}{p{4.5cm}p{2.5cm}p{7cm}}
+    \toprule
+    \textbf{Concepto Matem\'{a}tico} & \textbf{S\'{i}mbolo} & \textbf{Interpretaci\'{o}n Pra\'{c}tica} \\
+    \midrule
+    Variable Independiente & $X$ & Tiempo $t$ (segundos) durante inferencia \\
+    Variable Dependiente & $Y$ & Potencia instant\'{a}nea $P(t)$ en watts \\
+    Funci\'{o}n a integrar & $f(x)$ & Perfil de potencia $P(t)$ modelado anal\'{i}ticamente \\
+    Integral Definida & $\displaystyle \int_a^b P(t)\,dt$ & Consumo energetico acumulado en intervalo $[a,b]$ \\
+    L\'{i}mites de integraci\'{o}n & $a, b$ & Instante inicial y final de la inferencia \\
+    Resultado (Area bajo curva) & $Z$ & Energia total consumida en Joules \\
+    Antiderivada/Primitiva & $F(t)$ & Funci\'{o}n cuya derivada es $P(t)$ \\
+    Teorema Fundamental del C\'{a}lculo & N/A & $E = F(b) - F(a)$ \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+Este framework permite pasar de mediciones discretas de potencia a cuantificaciones precisas de energía acumulada. La integral definida $E_{[a,b]} = \int_a^b P(t)\,dt$ representa el área bajo la curva de potencia en el tiempo, que es exactamente la energía total consumida durante la inferencia. Este enfoque habilita tanto análisis analíticos (cuando $P(t)$ admite primitiva elemental) como numéricos (cuando los datos son discretos o el perfil es complejo).
+
+\subsection{Alternativas de Solución para Fase Alpha}
+
+Basándome en el framework matemático y considerando un horizonte de 4 meses, propongo tres alternativas complementarias que cumplen los objetivos del curso de Cálculo Integral:
+
+\subsubsection{Alternativa 1: Modelado Analítico con Antiderivadas}
+
+Cuando el perfil de potencia $P(t)$ durante la inferencia pueda aproximarse por funciones elementales (polinomios, exponenciales), aplicaré técnicas de antiderivadas. Si existe una primitiva $F(t)$ cuya derivada es $P(t)$, obtengo el consumo acumulado exacto:
+
+\begin{equation}
+E_{[a,b]} = \int_a^b P(t)\,dt = F(b) - F(a)
+\end{equation}
+
+\noindent\textbf{Aplicación práctica:} Modelar el consumo de un LLM durante inferencia de secuencias de tokens como $P(t) = P_0 + \alpha t + \beta t^2$ (componente base más variación polinómica), calcular la antiderivada, y obtener fórmulas cerradas para consumo en función de duración de inferencia.
+
+\noindent\textbf{Ventajas:} Resultados exactos, facilita sensibilidad paramétrica, permite predicciones analíticas sin computación intensiva.
+
+\subsubsection{Alternativa 2: Integración Numérica con Datos Reales}
+
+Cuando $P(t)$ no tiene primitiva elemental o los datos provienen de sensores (discretos), empleo integrales definidas aproximadas mediante la regla del trapecio compuesto y la regla de Simpson:
+
+\begin{equation}
+E_{[a,b]} = \int_a^b P(t)\,dt \approx \text{Trapecio}(P; a, b, n) \quad \text{o} \quad \text{Simpson}(P; a, b, n)
+\end{equation}
+
+\noindent\textbf{Aplicación práctica:} Recolectar datos de potencia de GPU/CPU a intervalos regulares durante inferencia real en 1--2 modelos LLM. Aplicar ambas reglas numéricas, refinar la partición ($n$ creciente) hasta alcanzar tolerancia del 1--3\%, y comparar convergencia.
+
+\noindent\textbf{Ventajas:} Aplicable directamente a datos empíricos, bajo costo computacional, control de error sistemático, reproducible.
+
+\subsubsection{Alternativa 3: Comparación de Políticas Operativas}
+
+Defino escenarios de operación mediante familias de funciones $P_{\text{base}}(t), P_{\text{pol1}}(t), P_{\text{pol2}}(t), \ldots$ que representan estrategias (e.~g., ajuste de batch size, precisión numérica reducida, scheduling de inferencias). Para cada política, comparo el ahorro energético:
+
+\begin{equation}
+\Delta E = \int_a^b \left[P_{\text{base}}(t) - P_{\text{pol}}(t)\right]\,dt
+\end{equation}
+
+\noindent El ahorro relativo es:
+
+\begin{equation}
+\text{Ahorro (\%)} = 100 \cdot \frac{\Delta E}{\int_a^b P_{\text{base}}(t)\,dt}
+\end{equation}
+
+\noindent\textbf{Aplicación práctica:} Comparar el consumo de una inferencia estándar versus una versión con reduced precision (float16 vs float32), o batch tamaños diferentes, usando integrales indefinidas (analítico) o definidas (numérico) según disponibilidad de datos.
+
+\noindent\textbf{Ventajas:} Cuantifica impacto real de optimizaciones, permite jerarquizar estrategias, fundamenta decisiones de implementación.
+
+\subsection{Aplicación Práctica: Fase Alpha (4 meses)}
+
+Esta sección detalla cómo se integran las tres alternativas en un plan concreto y ejecutable para la fase inicial del proyecto:
+
+\subsubsection{Línea 1: Caracterización Analítica}
+
+Desarrollaré modelos analíticos $P(t)$ para escenarios de inferencia estándar (procesar $n$ tokens de entrada, generar $m$ tokens de salida). Aproximaré el perfil de potencia usando polinomios de bajo grado, calcularé sus antiderivadas simbólicamente, y obtendré fórmulas cerradas como $E(n, m) = F(n, m) - F(0, 0)$. Este modelo permitirá predicciones rápidas y análisis de sensibilidad respecto a parámetros de hardware y configuración.
+
+\subsubsection{Línea 2: Integración Numérica}
+
+Implementaré scripts en Python (NumPy, SciPy) que apliquen regla del trapecio y Simpson a series temporales de consumo. Adquiriré datos de potencia real de 1--2 modelos LLM (por ejemplo, un modelo ligero tipo Mistral-7B y uno más grande tipo LLaMA-70B) bajo condiciones controladas. Refinaré las particiones hasta alcanzar tolerancias del 1--3\%, documentando convergencia y comparando precisión de ambas reglas.
+
+\subsubsection{Línea 3: Evaluación de Políticas}
+
+Compararé políticas operativas específicas (e.~g., float16 vs float32, batch size 1 vs 16, scheduling de inferencias) calculando $\Delta E$ analítica o numéricamente. Documentaré ahorros relativos en cada escenario, priorizando políticas más viables de implementar. Las estimaciones serán conservadoras: esperaré reducciones del 5--15\% en consumo bajo optimizaciones simples.
+
+\subsubsection{Resultados Esperados y Alcance}
+
+Al completar esta fase alpha, el proyecto entregará:
+
+\begin{enumerate}
+    \item Modelos matemáticos de consumo de potencia basados en cálculo integral.
+    \item Herramientas de integración numérica validadas y documentadas para datos reales.
+    \item Métricas estandarizadas de eficiencia (tokens/Wh, inferencias/Joule) para 1--2 modelos.
+    \item Análisis cuantitativo de al menos 3 políticas de optimización.
+    \item Framework reproducible y extensible para futuras expansiones (más modelos, otros tipos de carga).
+\end{enumerate}
+
+El marco de 4 meses permite validar la viabilidad del enfoque matemático sin pretender una exhaustividad que requeriría ciclos más amplios de investigación. Las próximas etapas incluirían: (i) expansión a más modelos y arquitecturas, (ii) integración con sistemas de scheduling en producción, (iii) análisis de impacto ambiental en escala global.

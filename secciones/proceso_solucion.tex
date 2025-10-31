@@ -1,0 +1,290 @@
+\section{Proceso de Solución}
+\textit{¿Cómo lo voy a hacer?}
+
+\subsection{Diseño del plan de acción}
+
+El plan de acción se estructura en cuatro etapas secuenciales, cada una construida sobre los resultados de la anterior. El diagrama de flujo a continuación ilustra el flujo de trabajo:
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.8cm,
+        auto,
+        box/.style={rectangle, draw, fill=blue!20, rounded corners, minimum width=3.2cm, minimum height=0.65cm},
+        process/.style={rectangle, draw, fill=green!20, rounded corners, minimum width=3.2cm, minimum height=0.65cm},
+        decision/.style={diamond, draw, fill=yellow!20, minimum width=2.2cm, minimum height=0.85cm},
+        refine/.style={rectangle, draw, fill=red!20, rounded corners, minimum width=2.2cm, minimum height=0.65cm}
+    ]
+    
+    % Etapa 1
+    \node[box] (step1) {Etapa 1: Adquisicion Datos};
+    
+    % Etapa 2
+    \node[process, below=of step1] (step2) {Etapa 2: Modelado Analitico};
+    
+    % Etapa 3
+    \node[process, below=of step2] (step3) {Etapa 3: Integracion Numerica};
+    
+    % Decision node
+    \node[decision, below=of step3] (decide) {Error menor 3\%};
+    
+    % Refine node
+    \node[refine, right=2cm of decide] (refloop) {Refinar n};
+    
+    % Etapa 4
+    \node[process, below=1.5cm of decide] (step4) {Etapa 4: Comparacion Politicas};
+    
+    % End node
+    \node[box, below=of step4] (end) {Resultados Finales};
+    
+    % Arrows
+    \draw[thick,->] (step1) -- (step2);
+    \draw[thick,->] (step2) -- (step3);
+    \draw[thick,->] (step3) -- (decide);
+    \draw[thick,->] (decide) -- node[right] {SI} (step4);
+    \draw[thick,->] (decide) -- node[above] {NO} (refloop);
+    \draw[thick,->] (refloop.north) |- (step3.east);
+    \draw[thick,->] (step4) -- (end);
+    
+    \end{tikzpicture}
+    \caption{Diagrama de flujo del proceso de solucion por etapas.}
+    \label{fig:flowchart}
+\end{figure}
+
+\textbf{Descripción del Flujo:}
+
+\begin{enumerate}
+    \item \textbf{Etapa 1 - Adquisición de Datos:} Recolección de series temporales de potencia (watts) desde GPU/CPU durante inferencia en modelos LLM. Los datos se preparan y se indexan por tiempo (segundos).
+    
+    \item \textbf{Etapa 2 - Modelado Analítico:} Ajuste polinómico de los datos para obtener una función $P(t) = P_0 + \alpha t + \beta t^2$. Se calcula la antiderivada $F(t)$ y se obtiene el consumo teórico exacto $E_{\text{analítico}} = F(b) - F(a)$.
+    
+    \item \textbf{Etapa 3 - Integración Numérica:} Aplicación de las reglas del Trapecio y Simpson sobre los mismos datos para obtener aproximaciones $E_{\text{Trap}}$ y $E_{\text{Simp}}$. Se calcula el error relativo respecto al modelo analítico.
+    
+    \item \textbf{Validación:} Si el error es menor al 3\%, los métodos son consistentes y pasamos a Etapa 4. Si no, refinamos el número de intervalos $n$ y repetimos Etapa 3.
+    
+    \item \textbf{Etapa 4 - Comparación de Políticas:} Con métodos validados, aplicamos la misma metodología a escenarios alternativos (reduced precision, batch sizes diferentes) y calculamos ahorros energéticos.
+\end{enumerate}
+
+\subsection{Etapas de implementación}
+
+La implementación del proyecto se divide en cuatro fases consecutivas, cada una con entregables específicos y criterios de validación:
+
+\textbf{Fase 1: Preparación del Entorno y Adquisición de Datos Experimentales}
+
+Esta fase establece la infraestructura necesaria para desarrollar simulaciones computacionales y recolectar datos reales de consumo energético. Las actividades incluyen:
+
+\begin{itemize}
+    \item Configuración del entorno de desarrollo Python 3.10+ con stack científico completo: NumPy (álgebra lineal y polinomios), SciPy (integración numérica), Matplotlib (visualización), pandas (análisis de datos).
+    \item Instalación y calibración de herramientas de monitoreo energético:
+    \begin{itemize}
+        \item \texttt{nvidia-smi} para GPUs NVIDIA con registro de potencia en tiempo real.
+        \item \texttt{psutil} y \texttt{PowerTop} para monitoreo de CPU y RAM.
+        \item \texttt{codecarbon} para estimación de huella de carbono.
+    \end{itemize}
+    \item Diseño de experimentos controlados: ejecución de modelos LLM (GPT-2, BERT, LLaMA) en tareas de inferencia estandarizadas con parámetros fijos (temperatura, longitud de secuencia, número de tokens).
+    \item Captura sistemática de series temporales $P(t)$ con frecuencia de 1 Hz durante ventanas de tiempo de 300--600 segundos por modelo.
+    \item Estructuración de datasets en formato CSV/JSON con columnas: \texttt{timestamp}, \texttt{power\_watts}, \texttt{model\_name}, \texttt{batch\_size}, \texttt{precision}.
+    \item Validación estadística de datos: pruebas de normalidad, detección de outliers mediante criterio IQR, interpolación lineal para gaps menores al 2\%.
+\end{itemize}
+
+\textbf{Entregable}: Dataset limpio con mínimo 3 series temporales ($> 1000$ puntos cada una), notebook de Jupyter documentando proceso de captura, reporte de calidad de datos con métricas estadísticas.
+
+\textbf{Fase 2: Modelado Analítico mediante Técnicas de Integración}
+
+Esta fase aplica los conceptos fundamentales del cálculo integral para obtener soluciones analíticas exactas del consumo energético. Se desarrollan las siguientes actividades:
+
+\begin{itemize}
+    \item \textbf{Regresión polinómica}: Ajuste de funciones $P(t) = a_0 + a_1 t + a_2 t^2 + \ldots + a_n t^n$ utilizando mínimos cuadrados con \texttt{numpy.polyfit()} para grados $n \in \{2, 3, 4\}$. Selección del grado óptimo mediante criterio de información de Akaike (AIC).
+    
+    \item \textbf{Cálculo de la integral indefinida}: Obtención de antiderivadas mediante integración término a término:
+    \[
+    F(t) = \int P(t) \, dt = a_0 t + \frac{a_1}{2} t^2 + \frac{a_2}{3} t^3 + \ldots + \frac{a_n}{n+1} t^{n+1} + C
+    \]
+    
+    \item \textbf{Aplicación del Teorema Fundamental del Cálculo}: Evaluación de la integral definida para calcular el consumo energético total en el intervalo $[t_i, t_f]$:
+    \[
+    E_{\text{analítico}} = \int_{t_i}^{t_f} P(t) \, dt = F(t_f) - F(t_i)
+    \]
+    
+    \item \textbf{Validación estadística}: Análisis de bondad de ajuste mediante $R^2 > 0.90$, RMSE normalizado, y prueba de residuos (test de Durbin-Watson para autocorrelación).
+    
+    \item \textbf{Visualización comparativa}: Gráficas superpuestas de datos experimentales $P(t)_{\text{obs}}$ versus modelo ajustado $P(t)_{\text{modelo}}$, con bandas de confianza al 95\%.
+    
+    \item \textbf{Simulaciones computacionales}: Generación de escenarios sintéticos variando parámetros del modelo para evaluar sensibilidad del consumo energético ante cambios en patrones de carga.
+\end{itemize}
+
+\textbf{Entregable}: Informe técnico con funciones $P(t)$ parametrizadas por modelo, valores de $E_{\text{analítico}}$ con intervalos de confianza, gráficas de ajuste, código Python documentado para reproducibilidad.
+
+\textbf{Fase 3: Simulaciones Computacionales con Integración Numérica}
+
+En esta fase se desarrollan e implementan algoritmos de integración numérica para validar y comprobar los modelos analíticos obtenidos en la Fase 2. Las actividades incluyen:
+
+\begin{itemize}
+    \item \textbf{Implementación de la Regla del Trapecio}: Desarrollo algorítmico de la aproximación mediante suma de trapecios:
+    \[
+    E_{\text{Trap}} = \frac{h}{2} \left[ P(t_0) + 2\sum_{i=1}^{n-1} P(t_i) + P(t_n) \right], \quad h = \frac{t_f - t_i}{n}
+    \]
+    Simulaciones con particiones $n \in \{10, 20, 50, 100, 200, 500\}$ para evaluar convergencia.
+    
+    \item \textbf{Implementación de la Regla de Simpson (1/3)}: Codificación del método de orden superior:
+    \[
+    E_{\text{Simp}} = \frac{h}{3} \left[ P(t_0) + 4\sum_{i \text{ impar}} P(t_i) + 2\sum_{i \text{ par}} P(t_i) + P(t_n) \right]
+    \]
+    Aplicación sobre el mismo conjunto de particiones para comparación directa.
+    
+    \item \textbf{Validación cruzada}: Cálculo del error relativo porcentual entre métodos numéricos y solución analítica:
+    \[
+    \epsilon_{\text{rel}} = \left| \frac{E_{\text{numérico}} - E_{\text{analítico}}}{E_{\text{analítico}}} \right| \times 100\%
+    \]
+    Criterio de aceptación: $\epsilon_{\text{rel}} < 3\%$ para $n \geq 50$.
+    
+    \item \textbf{Análisis de convergencia}: Generación de gráficas log-log de $\epsilon_{\text{rel}}$ versus $n$ para caracterizar orden de convergencia. Verificación teórica: Trapecio $\mathcal{O}(h^2)$, Simpson $\mathcal{O}(h^4)$.
+    
+    \item \textbf{Estudio de eficiencia computacional}: Benchmarking mediante \texttt{timeit} para medir tiempo de ejecución versus precisión. Identificación del punto óptimo de trade-off costo-exactitud.
+    
+    \item \textbf{Simulaciones de sensibilidad}: Evaluación del impacto de ruido en datos experimentales sobre precisión de métodos numéricos. Adición controlada de ruido gaussiano con $\sigma \in \{1\%, 5\%, 10\%\}$ del valor promedio de $P(t)$.
+\end{itemize}
+
+\textbf{Entregable}: Módulo Python con implementaciones de Trapecio y Simpson, tabla comparativa exhaustiva (Trapecio vs. Simpson vs. Analítico) con métricas de error y tiempo, gráficas de convergencia, reporte técnico con recomendaciones sobre $n$ óptimo por método.
+
+\textbf{Fase 4: Aplicación de la Integral a Políticas de Optimización Energética}
+
+Esta fase culminante aplica todas las técnicas de integración desarrolladas para resolver la situación problémica inicial: cuantificar y comparar el impacto energético de diferentes configuraciones de despliegue de modelos LLM. Las actividades incluyen:
+
+\begin{itemize}
+    \item \textbf{Diseño experimental de escenarios alternativos}:
+    \begin{itemize}
+        \item Reducción de precisión numérica: FP32 (baseline) $\to$ FP16 (half precision) $\to$ INT8 (quantization)
+        \item Ajuste de tamaño de lote: batch sizes $\in \{1, 4, 8, 16, 32\}$ tokens por inferencia
+        \item Técnicas de compresión: pruning, knowledge distillation, post-training quantization
+    \end{itemize}
+    
+    \item \textbf{Adquisición de datos experimentales}: Captura de series temporales $P_{\text{alt}}(t)$ para cada configuración alternativa, manteniendo condiciones controladas (mismos prompts, misma longitud de secuencia).
+    
+    \item \textbf{Aplicación sistemática de métodos de integración}: Cálculo del consumo energético $E_{\text{alt}}$ mediante:
+    \begin{itemize}
+        \item Método analítico: ajuste polinómico + TFC
+        \item Método del Trapecio con $n = 100$ (validado en Fase 3)
+        \item Método de Simpson con $n = 100$ (mayor precisión)
+    \end{itemize}
+    
+    \item \textbf{Cuantificación de ahorros energéticos}: Cálculo del ahorro porcentual relativo a configuración base:
+    \[
+    \text{Ahorro\%} = \left( \frac{E_{\text{base}} - E_{\text{alt}}}{E_{\text{base}}} \right) \times 100\%
+    \]
+    Proyección de ahorros a escala: extrapolación a 1 millón de inferencias, cálculo de reducción de huella de carbono (kg CO$_2$eq).
+    
+    \item \textbf{Análisis multidimensional de trade-offs}: Evaluación simultánea de tres métricas:
+    \begin{itemize}
+        \item Eficiencia energética: consumo $E$ (Wh) por inferencia
+        \item Precisión del modelo: accuracy, perplexity, o F1-score según tarea
+        \item Latencia: tiempo de respuesta (segundos)
+    \end{itemize}
+    Visualización mediante gráficas de Pareto y scatter plots 3D.
+    
+    \item \textbf{Simulaciones de impacto a escala}: Modelado del consumo energético agregado para diferentes volúmenes de uso (1K, 10K, 100K, 1M inferencias). Análisis de sensibilidad ante variaciones en patrones de carga temporal.
+    
+    \item \textbf{Generación de recomendaciones}: Identificación de configuraciones Pareto-óptimas que maximizan eficiencia energética con degradación de accuracy $< 5\%$. Propuesta de estrategias de despliegue adaptativo según restricciones (presupuesto energético, requisitos de latencia).
+\end{itemize}
+
+\textbf{Entregable}: Dashboard interactivo (PowerBI o Plotly Dash) con comparación de políticas, reporte ejecutivo con tabla de ahorros energéticos proyectados, análisis cuantitativo de trade-offs, documento de recomendaciones técnicas para despliegue sostenible de LLMs en producción.
+
+\subsection{Herramientas y cronograma}
+
+\textbf{Stack Tecnológico}
+
+El proyecto utilizará Python 3.10+ como lenguaje principal de implementación, complementado con las siguientes librerías especializadas:
+
+\begin{itemize}
+    \item \textbf{NumPy 1.24+}: Biblioteca fundamental para computación numérica. Se utilizará para:
+    \begin{itemize}
+        \item Manipulación de arrays de datos temporales $P(t)$.
+        \item Ajuste de polinomios mediante \texttt{numpy.polyfit()} y \texttt{numpy.poly1d()}.
+        \item Cálculo de antiderivadas mediante integración simbólica de coeficientes polinómicos.
+        \item Evaluación eficiente de funciones en múltiples puntos.
+    \end{itemize}
+    
+    \item \textbf{SciPy 1.10+}: Herramientas avanzadas de computación científica. Funcionalidades clave:
+    \begin{itemize}
+        \item Módulo \texttt{scipy.integrate}: implementación de reglas de Trapecio (\texttt{trapezoid()}) y Simpson (\texttt{simpson()}).
+        \item Módulo \texttt{scipy.optimize}: ajuste de curvas no lineales si se requieren modelos más complejos.
+        \item Análisis estadístico mediante \texttt{scipy.stats} para validación de resultados.
+    \end{itemize}
+    
+    \item \textbf{Matplotlib 3.7+}: Visualización de datos y resultados. Se crearán:
+    \begin{itemize}
+        \item Gráficas de series temporales $P(t)$ con curvas de ajuste superpuestas.
+        \item Diagramas de convergencia (error vs. número de intervalos).
+        \item Gráficas de barras comparando consumo energético entre políticas.
+        \item Heatmaps de trade-offs entre precisión y eficiencia.
+    \end{itemize}
+    
+    \item \textbf{pandas 2.0+}: Gestión y análisis de datos tabulares:
+    \begin{itemize}
+        \item Importación de datasets desde archivos CSV/JSON.
+        \item Limpieza de datos: manejo de valores nulos, detección de outliers.
+        \item Agregaciones y estadísticas descriptivas por modelo/configuración.
+        \item Exportación de resultados en formatos estructurados para reportes.
+    \end{itemize}
+    
+    \item \textbf{Herramientas de monitoreo energético}:
+    \begin{itemize}
+        \item \texttt{nvidia-smi}: Monitoreo de potencia GPU en tiempo real (comando: \texttt{nvidia-smi --query-gpu=power.draw --format=csv}).
+        \item \texttt{psutil}: Monitoreo de CPU y memoria RAM en Python.
+        \item \texttt{codecarbon}: Librería especializada en tracking de huella de carbono en ML.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Cronograma de Ejecución}
+
+El proyecto se estructura en cuatro fases secuenciales distribuidas a lo largo de 11 semanas, permitiendo un desarrollo progresivo desde la captura de datos hasta la evaluación de políticas energéticas alternativas:
+
+\begin{table}[H]
+\centering
+\caption{Cronograma detallado del proyecto (Fase Alpha)}
+\label{tab:cronograma}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Período} & \textbf{Fase} & \textbf{Actividad Principal} \\ \midrule
+Semanas 1--3 & Fase 1 & Adquisición de datos y preparación entorno \\
+Semanas 4--6 & Fase 2 & Modelado analítico y cálculo de antiderivadas \\
+Semanas 7--9 & Fase 3 & Integración numérica y validación cruzada \\
+Semanas 10--11 & Fase 4 & Comparación de políticas energéticas \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Descripción de las Fases:}
+
+\begin{itemize}
+    \item \textbf{Fase 1 (Semanas 1--3)}: Configuración del entorno de experimentación, instalación de herramientas de monitoreo energético (nvidia-smi, psutil, codecarbon) y captura de series temporales de potencia $P(t)$ durante inferencia de modelos LLM. Se generarán datasets estructurados con al menos tres modelos diferentes (GPT-2, BERT, LLaMA), validando la calidad mediante detección de outliers y completitud de datos.
+    
+    \item \textbf{Fase 2 (Semanas 4--6)}: Aplicación de regresión polinómica sobre los datos recolectados para obtener funciones $P(t)$ parametrizadas. Cálculo de antiderivadas $F(t) = \int P(t) \, dt$ y evaluación del consumo energético teórico mediante el Teorema Fundamental del Cálculo. Análisis de bondad de ajuste mediante coeficientes $R^2$ y RMSE para garantizar modelos representativos.
+    
+    \item \textbf{Fase 3 (Semanas 7--9)}: Implementación de métodos de integración numérica (Trapecio y Simpson) con diferentes particiones ($n = 10, 20, 50, 100, 200$). Validación cruzada comparando resultados numéricos contra soluciones analíticas, estableciendo un criterio de convergencia de error relativo menor al 3\%. Análisis de eficiencia computacional y generación de recomendaciones sobre número óptimo de intervalos.
+    
+    \item \textbf{Fase 4 (Semanas 10--11)}: Evaluación de escenarios alternativos de optimización energética: reducción de precisión numérica (FP32 $\to$ FP16 $\to$ INT8), ajuste de tamaños de lote, y quantización de modelos. Cuantificación de ahorros energéticos mediante la metodología validada en fases anteriores. Análisis costo-beneficio considerando trade-offs entre eficiencia energética y precisión del modelo.
+\end{itemize}
+
+\textbf{Criterios de Validación por Fase:}
+
+Para asegurar el rigor metodológico, se establecen criterios de aceptación específicos al finalizar cada fase:
+
+\begin{itemize}
+    \item \textbf{Fase 1}: Al menos 3 series temporales con más de 1000 puntos de datos cada una, $R^2 > 0.90$ en ajuste polinómico preliminar, ausencia de gaps mayores al 5\% del total de mediciones.
+    
+    \item \textbf{Fase 2}: Coeficientes polinómicos físicamente interpretables (sin oscilaciones espurias), valores de $E_{\text{analítico}}$ dentro del rango esperado (10--500 Wh), visualizaciones que demuestren ajuste adecuado entre modelo y datos experimentales.
+    
+    \item \textbf{Fase 3}: Error relativo $\epsilon_{\text{rel}} < 3\%$ entre métodos numéricos y analítico para $n \geq 50$ intervalos, evidencia de convergencia monótona al incrementar $n$, documentación de tiempo computacional por método.
+    
+    \item \textbf{Fase 4}: Identificación de al menos 2 configuraciones alternativas con ahorro energético $> 15\%$, cuantificación de degradación de accuracy asociada ($< 5\%$ preferible), generación de recomendaciones basadas en análisis cuantitativo de trade-offs.
+\end{itemize}
+
+\textbf{Recursos Necesarios}
+
+\begin{itemize}
+    \item \textbf{Hardware}: GPU NVIDIA (GTX 1660 o superior) con soporte CUDA, CPU multi-core (4+ núcleos), 16 GB RAM mínimo.
+    \item \textbf{Software}: Python 3.10+, Jupyter Notebook, Git para control de versiones.
+    \item \textbf{Acceso a modelos}: Hugging Face Transformers para descarga de modelos LLM pre-entrenados.
+    \item \textbf{Tiempo de dedicación}: 15-20 horas semanales distribuidas entre experimentación, análisis y documentación.
+\end{itemize}
+

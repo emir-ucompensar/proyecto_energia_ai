@@ -1,0 +1,269 @@
+\section{Marco Teórico}
+
+El análisis del consumo energético en sistemas de inteligencia artificial requiere una comprensión profunda tanto de conceptos matemáticos como de métricas específicas del dominio. Este marco teórico establece las bases para cuantificar y optimizar el consumo energético en centros de datos que ejecutan modelos de IA generativa, combinando principios del cálculo integral con métricas especializadas de eficiencia computacional.
+
+\subsection{Conceptos Fundamentales}
+
+\begin{table}[ht]
+\centering
+\caption{Glosario de Términos y Métricas Fundamentales}
+\begin{tabular}{>{\bfseries}p{2.5cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Término} & \textbf{Unidades} & \textbf{Descripción} \\
+\midrule
+FLOPS & Operaciones/segundo & Operaciones de punto flotante por segundo. Mide la capacidad de procesamiento computacional. \\
+\addlinespace
+Watt (W) & Joules/segundo & Unidad de potencia instantánea. Mide el consumo energético por unidad de tiempo. \\
+\addlinespace
+PUE & Adimensional & Relación entre la energía total del centro de datos y la energía usada por equipos IT. \\
+\addlinespace
+Throughput & Tokens/segundo & Velocidad de procesamiento de texto en modelos de lenguaje. \\
+\addlinespace
+Air Flow & m³/minuto & Tasa de flujo de aire para refrigeración. \\
+\addlinespace
+Thermal Design Power (TDP) & Watts & Máxima potencia que un componente puede disipar en operación normal. \\
+\addlinespace
+Memory Bandwidth & GB/segundo & Tasa de transferencia de datos entre memoria y procesador. \\
+\addlinespace
+CPU Utilization & Porcentaje & Porcentaje de uso de la capacidad de procesamiento. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Fundamentos Matemáticos para el Análisis Energético}
+
+El análisis del consumo energético en sistemas de IA requiere un marco matemático riguroso basado en el cálculo integral. Desarrollaremos las herramientas fundamentales y su aplicación práctica, enfatizando la claridad y precisión matemática.
+
+\subsubsection{Modelo Energético Fundamental}
+
+\begin{definicion}[Energía Total del Sistema]
+La energía total consumida por un sistema de IA durante un intervalo de tiempo se define mediante la integral definida:
+\begin{equation}
+    E(T) = \int_{t_0}^{t_0+T} P(t)\,dt \eqnlabel{E1}
+\end{equation}
+donde:
+\begin{itemize}
+    \item $E(T)$ representa la energía total consumida [kWh]
+    \item $P(t)$ es la función de potencia instantánea [kW]
+    \item $[t_0, t_0+T]$ es el intervalo de tiempo de interés [h]
+\end{itemize}
+\end{definicion}
+
+\begin{lema}[Propiedades de la Función de Energía]
+La función de energía $E(T)$ cumple las siguientes propiedades:
+\begin{enumerate}
+    \item Es continua en todo su dominio
+    \item Es monótona creciente: $T_1 < T_2 \implies E(T_1) < E(T_2)$
+    \item Es aditiva: $E(T_1 + T_2) = E(T_1) + E(T_2)$
+\end{enumerate}
+\end{lema}
+
+\begin{teorema}[Caracterización del Consumo]
+Para cualquier intervalo $[a,b]$, el consumo energético satisface:
+\begin{equation}
+    E(b) - E(a) = \int_a^b P(t)\,dt \eqnlabel{E2}
+\end{equation}
+y la tasa de cambio instantánea viene dada por:
+\begin{equation}
+    \frac{d}{dt}E(t) = P(t) \eqnlabel{E3}
+\end{equation}
+\end{teorema}
+
+\subsubsection{Descomposición del Consumo Energético}
+
+\begin{definicion}[Componentes de Potencia]
+La potencia instantánea total $P(t)$ se descompone en tres componentes fundamentales:
+\begin{equation}
+    P(t) = P_{\text{base}}(t) + P_{\text{comp}}(t) + P_{\text{cool}}(t) \eqnlabel{P1}
+\end{equation}
+
+\noindent donde cada término representa:
+\begin{itemize}
+    \item $P_{\text{base}}(t)$: Potencia base del sistema [kW]
+    \begin{itemize}
+        \item Servidores en estado inactivo
+        \item Sistemas de monitoreo
+        \item Infraestructura básica
+    \end{itemize}
+    
+    \item $P_{\text{comp}}(t)$: Potencia de cómputo [kW]
+    \begin{itemize}
+        \item GPUs/TPUs en procesamiento activo
+        \item Operaciones de memoria
+        \item Comunicación entre nodos
+    \end{itemize}
+    
+    \item $P_{\text{cool}}(t)$: Potencia de refrigeración [kW]
+    \begin{itemize}
+        \item Sistemas de enfriamiento
+        \item Control térmico
+        \item Ventilación
+    \end{itemize}
+\end{itemize}
+\end{definicion}
+
+\subsubsection{Análisis mediante Cálculo Variacional}
+
+\begin{teorema}[Principio de Mínima Acción Energética]
+El consumo óptimo de energía satisface la ecuación de Euler-Lagrange:
+\begin{equation}
+    \frac{\partial \mathcal{L}}{\partial P} - \frac{d}{dt}\left(\frac{\partial \mathcal{L}}{\partial \dot{P}}\right) = 0 \eqnlabel{L1}
+\end{equation}
+donde $\mathcal{L}(P, \dot{P}, t)$ es el Lagrangiano del sistema:
+\begin{equation}
+    \mathcal{L} = P(t) + \lambda(t)\left(R(t) - R_{\text{min}}\right) \eqnlabel{L2}
+\end{equation}
+con $R(t)$ siendo el rendimiento instantáneo y $\lambda(t)$ el multiplicador de Lagrange.
+\end{teorema}
+
+\begin{corolario}[Condición de Optimalidad]
+Para un sistema en equilibrio:
+\begin{equation}
+    \frac{\partial P}{\partial t} = -\lambda(t)\frac{\partial R}{\partial t} \eqnlabel{L3}
+\end{equation}
+\end{corolario}
+
+Esta formulación permite:
+\begin{itemize}
+    \item Predicción de consumo futuro
+    \item Identificación de patrones cíclicos
+    \item Optimización de periodos de carga
+\end{itemize}
+
+\subsection{Métricas y Variables de Eficiencia}
+
+\subsubsection{Métricas Fundamentales}
+
+\begin{definicion}[Métricas de Eficiencia Energética]
+Las siguientes métricas caracterizan la eficiencia energética del sistema:
+
+\begin{enumerate}
+    \item \importante{Power Usage Effectiveness (PUE)}
+    \begin{equation}
+        \text{PUE} = \frac{\text{Potencia Total del Centro de Datos}}{\text{Potencia Consumida por Equipos IT}} \eqnlabel{M1}
+    \end{equation}
+    \begin{itemize}
+        \item Rango óptimo: $1.1 \leq \text{PUE} \leq 1.4$
+        \item De acuerdo con los informes oficiales de Google, el valor promedio de eficiencia energética de sus centros de datos ha alcanzado un $\text{PUE} \approx 1.07$, manteniéndose casi constante desde 2008 hasta 2025
+        \item Estado del arte: $\text{PUE} \approx 1.07$ \parencite{google2025efficiency}
+    \end{itemize}
+
+    \item \importante{Densidad de Potencia Computacional (DPC)}
+    \begin{equation}
+        \text{DPC} = \frac{\text{Potencia Total}}{\text{FLOPS}} \eqnlabel{M2}
+    \end{equation}
+    \begin{itemize}
+        \item Unidades: W/PFLOPS
+        \item Referencia: $\text{DPC}_{\text{óptimo}} \approx 20$ mW/TFLOPS
+    \end{itemize}
+
+    \item \importante{Eficiencia por Token (EPT)}
+    \begin{equation}
+        \text{EPT} = \frac{\displaystyle\int_{t_0}^{t_1} P(t)\,dt}{\text{Tokens Procesados}} \eqnlabel{M3}
+    \end{equation}
+    \begin{itemize}
+        \item Unidades: Wh/token
+        \item Valor típico: $0.1$--$0.3$ mWh/token
+    \end{itemize}
+\end{enumerate}
+\end{definicion}
+
+\begin{teorema}[Relación entre Métricas]
+Las métricas fundamentales están relacionadas por:
+\begin{equation}
+    \text{EPT} = \text{DPC} \cdot \text{PUE} \cdot \frac{\text{FLOPS}}{\text{Tokens/s}} \eqnlabel{M4}
+\end{equation}
+\end{teorema}
+
+\subsubsection{Métricas Derivadas y Análisis Avanzado}
+
+\begin{definicion}[Métricas de Rendimiento Dinámico]
+Se definen las siguientes métricas derivadas:
+
+\begin{enumerate}
+    \item \importante{Factor de Carga (FC)}
+    \begin{equation}
+        \text{FC} = \frac{1}{T}\int_{t_0}^{t_0+T} \frac{P(t)}{P_{\text{max}}}\,dt \eqnlabel{D1}
+    \end{equation}
+    \begin{itemize}
+        \item Interpretación: Utilización promedio normalizada
+        \item Rango: $0 \leq \text{FC} \leq 1$
+        \item Objetivo: $\text{FC} \geq 0.8$ para eficiencia óptima
+    \end{itemize}
+
+    \item \importante{Eficiencia Energética Dinámica (EED)}
+    \begin{equation}
+        \text{EED} = \frac{\text{Rendimiento}}{\text{EPT}} \cdot \frac{1}{\text{PUE}} \eqnlabel{D2}
+    \end{equation}
+    donde:
+    \begin{itemize}
+        \item Rendimiento: tokens/s o FLOPS según contexto
+        \item EPT: energía por token [Wh/token]
+        \item PUE: factor de eficiencia de la infraestructura
+    \end{itemize}
+\end{enumerate}
+\end{definicion}
+
+\begin{teorema}[Optimización de Carga]
+Para un sistema con función de rendimiento $R(P)$, la potencia óptima $P^*$ satisface:
+\begin{equation}
+    \frac{d}{dP}\left(\frac{R(P)}{P}\right)\bigg|_{P=P^*} = 0 \eqnlabel{D3}
+\end{equation}
+sujeto a las restricciones:
+\begin{align}
+    0 &\leq P \leq P_{\text{max}} \eqnlabel{D4} \\
+    R(P) &\geq R_{\text{min}} \eqnlabel{D5}
+\end{align}
+\end{teorema}
+
+\begin{corolario}[Eficiencia Máxima]
+La eficiencia máxima se alcanza cuando:
+\begin{equation}
+    \frac{R(P^*)}{P^*} = \max_{P \in [0,P_{\text{max}}]} \frac{R(P)}{P} \eqnlabel{D6}
+\end{equation}
+\end{corolario}
+
+\subsection{Implementación Práctica del Análisis Energético}
+
+\subsubsection{Procedimiento de Medición}
+
+\begin{enumerate}
+    \item \textbf{Medición Base}:
+        \begin{itemize}
+            \item Registrar $P_{\text{base}}(t)$ durante 24 horas sin carga
+            \item Calcular $E_{\text{base}} = \int_{0}^{24} P_{\text{base}}(t)\,dt$
+        \end{itemize}
+    
+    \item \textbf{Medición bajo Carga}:
+        \begin{itemize}
+            \item Monitorear $P(t)$ durante operación normal
+            \item Registrar número de tokens procesados
+            \item Calcular $\text{EPT}$ cada hora
+        \end{itemize}
+    
+    \item \textbf{Análisis de Patrones}:
+        \begin{itemize}
+            \item Aplicar transformada de Fourier a $P(t)$
+            \item Identificar ciclos de carga
+            \item Optimizar programación de tareas
+        \end{itemize}
+\end{enumerate}
+
+\subsubsection{Optimización Energética}
+
+El proceso de optimización se basa en minimizar la integral:
+
+\[ \min_{t \in [0,T]} \int_{0}^{T} P(t)\,dt \]
+
+sujeto a las restricciones:
+\begin{align*}
+    P(t) &\leq P_{\text{max}} \\
+    \text{Rendimiento}(t) &\geq \text{Rendimiento}_{\text{min}}
+\end{align*}
+
+Este problema de optimización se resuelve mediante:
+\begin{itemize}
+    \item Programación dinámica para distribución de carga
+    \item Análisis de multiplicadores de Lagrange
+    \item Métodos numéricos para aproximación de integrales
+\end{itemize}

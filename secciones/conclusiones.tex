@@ -1,0 +1,60 @@
+\clearpage
+\section{Conclusiones}
+
+Esta investigación demuestra que el cálculo integral es fundamental para el análisis cuantitativo del consumo energético de modelos de IA. A través de mediciones experimentales, análisis matemático y visualización, se establecieron relaciones funcionales entre arquitectura y demanda energética.
+
+\subsection{Logro de objetivos}
+
+Se cumplió el objetivo de aplicar cálculo integral al análisis energético de modelos de IA en local, integrando: (1) mediciones de cinco modelos LLM en hardware consumer (GTX 1660 Ti), (2) cálculo de integrales definidas ($E = \int_0^T P(t) \, dt$), (3) implementación de métodos numéricos con convergencia validada, (4) análisis de regresión ($R^2 > 0.95$), y (5) cálculo del área bajo la curva $Z$ como métrica integral. La metodología es reproducible y escalable.
+
+Los objetivos específicos incluyeron: (1) fundamentación teórica con 11 referencias recientes contextualizando el movimiento Green AI \cite{schwartz2019green, greensoftware2025position}, (2) métricas experimentales con eficiencias de 560 a 1,995 tokens/Wh (rango 3.6x), (3) seis visualizaciones mediante scripts Python modulares, y (4) interpretación del área $Z \approx 107.3$ Wh·B como métrica holística de consumo.
+
+\subsection{Hallazgos principales}
+
+La relación tamaño-consumo es no lineal, siguiendo $E(N) = a \cdot N^b + c$ con $b \approx 0.48$, atribuible a cuantización int4, eficiencia de GPU con cargas pesadas, y batch size fijo. Alizadeh y Castor \cite{alizadeh2024green} confirman que la eficiencia es difícil de predecir a priori.
+
+TinyLLaMA-1.1B logra eficiencia 3.6x superior a LLaMA-3 8B, validando modelos específicos de dominio \cite{chatterjee2025energy}. Behdin et al. \cite{behdin2025scaling} y Tabbakh et al. \cite{tabbakh2024sustainable} confirman que Small Language Models optimizados logran calidad comparable con costos reducidos.
+
+Los métodos numéricos demuestran: Trapecio (error $< 0.002\%$, $< 0.5$ ms) y Simpson 1/3 (error $< 0.00002\%$, $\mathcal{O}(h^4)$), viables para monitoreo en tiempo real \cite{girija2024ai}.
+
+El análisis identifica tres configuraciones Pareto-óptimas: TinyLLaMA (mínimo consumo 11.7 Wh, máxima eficiencia 1,995 t/Wh), Gemma-2B (balance óptimo 13.2 Wh, 1,418 t/Wh), y Phi-3 Mini (3.8B parámetros, eficiencia 949 t/Wh superior a modelos 7-8B). Mistral-7B y LLaMA-3 8B son dominados.
+
+\subsection{Contribuciones del proyecto}
+
+Las contribuciones metodológicas incluyen framework reproducible (scripts Python modulares con documentación), validación cruzada con errores $< 3\%$, y seis visualizaciones complementarias.
+
+Matemáticamente, se demostró la aplicabilidad del Teorema Fundamental del Cálculo en análisis energético, se validó convergencia de métodos numéricos, se desarrollaron modelos de potencia dinámica con precisión $> 97\%$, y se calculó la métrica integral (área $Z$) para benchmarking.
+
+Prácticamente, se cuantificó la eficiencia de modelos LLM en hardware consumer, se identificaron configuraciones Pareto-óptimas, y se evidenció que modelos 1-4B pueden ser más sostenibles que 7-8B.
+
+\subsection{Limitaciones del estudio}
+
+Las mediciones en GPU GTX 1660 Ti pueden variar en hardware moderno (Ada Lovelace, Hopper) o aceleradores especializados (TPUs, FPGAs) \cite{jouppi2023tpu}. El estudio se enfocó en inferencia; el entrenamiento consume órdenes de magnitud más (GPT-3: 1,287 MWh, GPT-4: 50-60 GWh) \cite{tabbakh2024sustainable, chatterjee2025energy, greensoftware2025position}.
+
+La heterogeneidad en cuantización (int4 para LLaMA-3/Mistral vs. precisión original) complica comparaciones directas. Tests de 10 minutos capturan comportamiento estacionario pero no fenómenos de largo plazo (degradación térmica, throttling); tests de 1-2 horas proporcionarían datos más robustos.
+
+\subsection{Trabajos futuros}
+
+La extensión a modelos multimodales (CLIP, LLaVA), de difusión (Stable Diffusion, DALL-E) y de audio (Whisper, MusicGen) ampliaría el alcance. El análisis del ciclo de vida completo debe cubrir las seis fases de Green Software Foundation \cite{greensoftware2025position}: preparación, ingeniería de datos, entrenamiento, integración, operaciones y fin de vida.
+
+La optimización automática basada en integrales puede minimizar $\alpha \cdot \mathcal{L}(\theta) + \beta \cdot \int_0^T P(\theta, t) \, dt$, balanceando precisión y eficiencia \cite{preuveneers2020resource}. La evaluación de técnicas de compresión (pruning, distillation, quantization, LoRA) es prioritaria; Verdecchia et al. \cite{verdecchia2022datacentric} logran reducciones de 92.16\% mediante optimización de datos.
+
+La infraestructura de monitoreo continuo debe calcular $\text{PUE}(t) = \frac{\int_0^t P_{\text{total}}(\tau) \, d\tau}{\int_0^t P_{\text{IT}}(\tau) \, d\tau}$ en tiempo real. Google reporta PUE = 1.10 vs. promedio industrial 1.58 \cite{google2025efficiency}.
+
+\subsection{Reflexiones finales}
+
+El cálculo integral es esencial para abordar desafíos de sostenibilidad en IA. La cuantificación rigurosa mediante $E = \int_0^T P(t) \, dt$ permite decisiones fundamentadas sobre arquitecturas, hardware e infraestructura. Cuando el entrenamiento de modelos grandes consume electricidad equivalente a 120 hogares anuales \cite{tabbakh2024sustainable} y la demanda computacional crece exponencialmente \cite{altman2024gpus}, optimizar eficiencia energética es imperativo ético y económico.
+
+El movimiento Green AI \cite{schwartz2019green, greensoftware2025position} propone hacer de la eficiencia un criterio igual de importante que la precisión. Este proyecto contribuye con: métricas reproducibles (tokens/Wh, área $Z$), metodologías validadas (integración numérica, regresión, Pareto), evidencia de que modelos compactos son sostenibles sin sacrificar utilidad, y herramientas open source documentadas.
+
+La convergencia entre cálculo integral y análisis energético ilustra el valor de fundamentos matemáticos para resolver problemas tecnológicos emergentes. Schwartz et al. \cite{schwartz2019green} observan que la computación de IA creció 300,000x entre 2012 y 2018; ese crecimiento debe acompañarse de incrementos en eficiencia mediante optimización matemática, innovación arquitectural y conciencia sostenible.
+
+\subsection{Declaración de sostenibilidad}
+
+Este proyecto consumió 74.9 Wh (0.0749 kWh), equivalente a 12.3 g CO$_2$ eq (intensidad Colombia: 164 g/kWh), 1.5 horas de bombillo LED 50W, o 0.002\% del consumo diario de un hogar colombiano. El código fuente y datos están disponibles para replicación, promoviendo transparencia en investigación de Green AI.
+
+\vspace{0.5cm}
+
+\begin{center}
+\textit{``Cada mejora en rendimiento y eficiencia energética nos recuerda que la innovación puede ser también un acto de cuidado. Este proyecto busca demostrar que la inteligencia artificial puede evolucionar cuidando tanto el progreso como el impacto que deja en el mundo.''}
+\end{center}

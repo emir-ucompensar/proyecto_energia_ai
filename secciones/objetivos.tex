@@ -1,0 +1,17 @@
+\section{Objetivos}
+
+\subsection{Objetivo General}
+
+Desarrollar un modelo matemático basado en técnicas de cálculo integral que cuantifique el consumo energético de modelos de inteligencia artificial generativa durante la inferencia, estableciendo métricas estandarizadas de eficiencia energética que permitan comparaciones objetivas entre sistemas y faciliten la toma de decisiones sobre su implementación y uso.
+
+\subsection{Objetivos Específicos}
+
+\begin{enumerate}
+    \item \textbf{Modelar analíticamente el perfil de consumo de potencia.} Caracterizar el comportamiento de potencia $P(t)$ durante la inferencia en modelos de IA como funciones analíticas (polinomiales, exponenciales o híbridas) mediante análisis de datos operacionales, permitiendo aplicar técnicas de antiderivadas para obtener expresiones cerradas del consumo acumulado en intervalos específicos.
+
+    \item \textbf{Implementar métodos de integración numérica para consumo real.} Desarrollar e implementar algoritmos de integración numérica (regla del trapecio y Simpson) que procesen datos discretos de sensores de potencia en centros de datos, permitiendo estimar el consumo energético acumulado cuando el perfil de potencia no admite primitivas elementales, con control de error mediante refinamiento adaptativo.
+
+    \item \textbf{Establecer métricas de eficiencia energética comparables.} Diseñar métricas estandarizadas (e.\,g., tokens por vatio-hora, inferencias por julios) que permitan comparar la eficiencia energética entre diferentes modelos de IA y arquitecturas, facilitando la selección de modelos óptimos según el tipo de tarea y las restricciones energéticas del sistema.
+    
+    \item \textbf{Validar el modelo con datos reales de inferencia.} Aplicar el framework desarrollado a 1--2 modelos de lenguaje reales en escenarios de inferencia controlados (variación de longitud de prompt, tokens de salida y concurrencia), demostrando la viabilidad y precisión del método mediante comparación con mediciones directas del hardware.
+\end{enumerate}

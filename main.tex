@@ -1,0 +1,30 @@
+% main.tex
+\documentclass[12pt]{article}
+\input{preambulo}
+
+\begin{document}
+
+\input{portada}
+
+\input{secciones/contenido}
+
+\input{secciones/introduccion}
+\input{secciones/objetivos}
+\input{secciones/justificacion}
+\input{secciones/marco_teorico}
+\input{secciones/estado_arte}
+\input{secciones/escenario}
+
+% FASE 2: Desarrollo de la Solución
+\input{secciones/metodologia}
+\input{secciones/proceso_solucion}
+\input{secciones/fundamentos_teoricos}
+
+% FASE 3: Análisis y Resultados
+\input{secciones/analisis_grafico}
+\input{secciones/conclusiones}
+
+\newpage
+\printbibliography[heading=bibintoc,title={Referencias bibliográficas}]
+
+\end{document}

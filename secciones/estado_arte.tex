@@ -1,0 +1,164 @@
+\section{Estado del Arte}
+
+La investigación sobre el consumo energético en sistemas de IA ha evolucionado muchísimo en los últimos años y desde su publicación para uso global hemos notado la gran adopción de la misma. A continuación, se presenta una revisión de las contribuciones más relevantes:
+
+\subsection{Estudios Fundamentales sobre Consumo Energético}
+
+\textcite{strubell2019energy} realizaron un estudio pionero que cuantificó el consumo energético en el entrenamiento de modelos de procesamiento de lenguaje natural. Sus hallazgos revelaron que el entrenamiento de un solo modelo de IA puede emitir tanto carbono como cinco automóviles durante toda su vida útil.
+
+\textcite{patterson2021carbon} profundizaron en el análisis de las emisiones de carbono asociadas al entrenamiento de grandes modelos neuronales, proponiendo metodologías para medir y reducir el impacto ambiental.
+
+Complementariamente, \textcite{du2019implicit} estudiaron los Modelos Basados en Energía (Energy-Based Models, EBM) y mostraron cómo definen distribuciones probabilísticas mediante una función de energía $E_\theta(x)$ siguiendo la distribución de Boltzmann $p_\theta(x) \,{\propto}\, e^{-E_\theta(x)}$. Para muestrear de estas distribuciones de forma eficiente, proponen el uso de dinámica de Langevin, que aprovecha el gradiente de la energía para mejorar los tiempos de mezcla frente a MCMC tradicionales en datos de alta dimensión (p. ej., imágenes). Este enfoque es relevante para el consumo energético porque el coste computacional se traslada del paso de inferencia explícita a procedimientos de muestreo iterativos guiados por gradientes; además, los EBM se han aplicado a tareas de generación de imágenes, donde las decisiones de diseño (arquitectura, número de pasos de muestreo, tamaño de lote) inciden directamente en el uso de energía durante entrenamiento e inferencia.
+
+% Necesitamos agregar las nuevas referencias del arxiv y otros recursos
+% TODO: Agregar las 8 referencias adicionales con sus respectivos análisis
+
+\subsection{Desarrollos Recientes}
+
+Las investigaciones más recientes sobre consumo energético en sistemas de IA se han orientado hacia cuatro áreas principales de innovación:
+
+\begin{itemize}
+    \item \textbf{Optimización de arquitecturas:} Rediseño de componentes críticos como los mecanismos de atención, bloques de procesamiento y estructuras de conexión neuronal para reducir operaciones redundantes sin sacrificar precisión. Las modificaciones incluyen capas convolucionales más eficientes, configuraciones mixtas (Transformer-MLP) y flujos de información optimizados.
+    
+    \item \textbf{Técnicas de cuantización y poda:} Reducción de la precisión numérica de 32 bits (FP32) a formatos más compactos (INT8, INT4) y eliminación selectiva de conexiones neuronales redundantes, logrando reducciones de hasta 75\% en requisitos de memoria y procesamiento con mínima pérdida de rendimiento. La cuantización post-entrenamiento (PTQ) y la cuantización consciente del entrenamiento (QAT) representan enfoques complementarios en este campo.
+    
+    \item \textbf{Hardware especializado:} Desarrollo de chips como TPUs (Tensor Processing Units), NPUs (Neural Processing Units) y ASICs diseñados específicamente para operaciones de IA con consumo optimizado. \textcite{jouppi2023tpu} presentan la TPU v4 de Google, un supercomputador reconfigurable ópticamente con soporte para embeddings, que demuestra una eficiencia energética hasta 1.93 veces superior a las GPUs NVIDIA A100 en tareas de procesamiento de lenguaje natural (BERT) y 1.33 veces más eficiente en redes convolucionales (ResNet), con consumos de 197W y 206W respectivamente frente a 380W y 273W en A100. La miniaturización de procesos (desde 7nm hasta 3nm) y arquitecturas energéticamente eficientes han reducido significativamente la energía requerida por operación.
+    
+    \item \textbf{Metodologías de medición:} Implementación de herramientas como Carbon Tracker, ML CO\textsubscript{2} Impact y frameworks de monitoreo en tiempo real que permiten visualizar, analizar y optimizar el consumo durante el ciclo de vida completo de los sistemas de IA, desde entrenamiento hasta inferencia en producción.
+\end{itemize}
+
+\textcite{yuan2025efficientllm} presentan un estudio integral sobre dimensiones de eficiencia en LLMs, identificando cinco métricas clave: tamaño del modelo, costo computacional (FLOPs), latencia y throughput, huella de memoria, y eficiencia energética. Este marco proporciona directrices para optimizar el rendimiento de modelos grandes mientras se reduce su huella ambiental. Entre las técnicas de arquitectura que estudian, destacan:
+
+\begin{itemize}
+    \item \textbf{Codificaciones posicionales eficientes:} Implementaciones como RoPE, Alibi o RelPE que mejoran la eficiencia frente a codificaciones posicionales absolutas, especialmente en contextos largos
+    \item \textbf{Mecanismos de atención optimizados:} Modificaciones como atención KV-cache, atención agrupada por consulta y variantes de atención dispersa que reducen los requisitos de memoria y computación
+    \item \textbf{Optimización de arquitecturas existentes:} Cambios estructurales para modelos como DeepSeek-R1, Qwen 2.5 y Phi que equilibran rendimiento y eficiencia 
+\end{itemize}
+
+\subsection{Métricas de eficiencia energética en LLMs}
+
+\textcite{yuan2025efficientllm} proponen la métrica de Consumo Energético Promedio (AEC) como un indicador clave para evaluar la eficiencia energética en modelos de lenguaje grandes. Esta métrica se formula como:
+
+\begin{equation}
+\text{AEC} = \frac{E_{\text{total}}}{T} = \frac{1}{T}\int_{0}^{T}P(t)dt
+\end{equation}
+
+Donde $T$ representa el tiempo total de entrenamiento o inferencia en segundos, $P(t)$ es el consumo energético instantáneo en Watts, y $E_{\text{total}}$ simboliza la energía total consumida en Joules. Este enfoque permite comparar diferentes arquitecturas y técnicas de optimización desde una perspectiva energética rigurosa, siendo crucial para reducir tanto los costos operacionales como el impacto ambiental de las implementaciones de IA a gran escala. El estudio además evalúa diferentes encodings posicionales, encontrando que RoPE y Relate destacan como los más eficientes energéticamente (consumiendo 652.79W y 646.39W respectivamente).
+
+\subsection{Benchmark de huella ambiental en inferencia de LLM}
+
+\textcite{jegham2025hungry} proponen un marco de evaluación consciente de la infraestructura para cuantificar la huella ambiental de la inferencia de LLMs en centros de datos comerciales, combinando métricas de rendimiento de APIs públicas con multiplicadores ambientales por región y atribución estadística del hardware que se usa para ejecutar cada prueba a modelos. Con análisis DEA (Data Envelopment Analysis) posicionan los modelos por eco-eficiencia, encontrando que variantes de razonamiento como o3 y DeepSeek-R1 son de las más intensivas energéticamente (más de 33 Wh por consulta larga), mientras que \emph{GPT-4.1 nano} se ubica entre las opciones más eficientes y \emph{Claude-3.7 Sonnet} destaca por eco-eficiencia. El trabajo subraya el impacto del escalamiento: aunque una consulta breve de GPT-4o puede rondar 0.43 Wh, multiplicar por cientos de millones de consultas diarias conduce a consumos de electricidad, agua y carbono de gran escala.
+
+Para estimar la energía por consulta, formulan:
+\begin{equation}
+E_{\text{query}}\;\text{(kWh)} = \Big( \frac{\text{Longitud de salida}}{\text{TPS}} + \frac{\text{Latencia}}{3600} \Big) \cdot ( P_{\text{GPU}}\,U_{\text{GPU}} + P_{\text{noGPU}}\,U_{\text{noGPU}} ) \cdot \text{PUE}
+\end{equation}
+
+Y derivan agua y carbono por consulta como:
+\begin{align}
+\text{Agua (L)} &= E_{\text{query}}\cdot \text{PUE} \cdot \text{WUE}_{\text{site}} + E_{\text{query}} \cdot \text{WUE}_{\text{source}} \\
+\text{Carbono (kgCO2e)} &= E_{\text{query}} \cdot \text{CIF}
+\end{align}
+
+\paragraph{Resumen simplificado por hardware.}
+La atribución por clase de hardware (p.\ ej., NVIDIA A100 vs.\ H100/H200/H800) y número de GPUs por tamaño de modelo permite proyectar el consumo. A modo ilustrativo (valores cualitativos agregados del estudio):
+
+\begin{table}[H]
+    \centering
+    \caption{Consumo relativo por modelo y clase de hardware (ilustrativo).}
+    \begin{tabular}{p{3.2cm}p{2.7cm}p{3.2cm}p{4cm}}
+    \toprule
+    \textbf{Modelo} & \textbf{Clase aprox.} & \textbf{Hardware típico} & \textbf{Energía por consulta} \\
+    \midrule
+        o3 / DeepSeek-R1 & Large ($\geq$70B) & H800/H100 (8 GPU) & Alta ($>$ 30 Wh long-prompt) \\
+        Claude-3.7 Sonnet & Large & H100/H200 (8 GPU) & Media-baja (eco-eficiente) \\
+        GPT-4o & Large & A100/H100 ($\geq$4 GPU) & Baja ($\sim$0.43 Wh/consulta corta) \\
+        GPT-4.1 nano & Small ($\leq$40B) & A100/H100 (2 GPU) & Muy baja ($\ll$ 1 Wh/consulta) \\
+    \bottomrule
+    \end{tabular}\label{tab:llm-huella}
+\end{table}
+
+Estos resultados son relevantes para ingeniería sostenible, ya que permiten fijar objetivos por consulta (Wh), por mil tokens, y por despliegue (kWh/día), además de incorporar factores PUE, WUE y CIF específicos por región y proveedor.
+
+\subsection{Modelos eficientes y arquitecturas optimizadas}
+
+Como destaca \textcite{yuan2025efficientllm}, existen implementaciones que logran equilibrar rendimiento y eficiencia energética, destacando tres familias importantes:
+
+\begin{itemize}
+    \item \textbf{DeepSeek-R1:} Una familia de modelos con enfoque en escalamiento agresivo y técnicas como atención agrupada por consulta (GQA) en sus versiones de 67B parámetros. El estudio de EfficientLLM incluye las versiones destiladas Distill-Qwen-1.5B, Distill-LLaMA-8B y Distill-Qwen-14B, que reducen significativamente el consumo energético manteniendo capacidades de razonamiento.
+    
+    \item \textbf{Qwen 2.5:} Evolución del modelo bilingüe (chino-inglés) que incorpora novedosas codificaciones posicionales (ALiBi/rotary) y esquemas para manejo de contexto largo (Dual Chunk Attention y YARN scaling). Las variantes de 7B, 14B, 32B y 72B representan diferentes compromisos entre capacidad y eficiencia, destacando por incorporar arquitecturas de mezcla de expertos (MoE) en algunas versiones para mejorar la eficiencia en modelos con alto conteo de parámetros.
+    
+    \item \textbf{Phi:} Serie de ``Modelos de Lenguaje Pequeños'' de Microsoft centrados en maximizar el rendimiento con una fracción del tamaño convencional. Phi-4 (14B parámetros) emplea destilación de conocimiento desde GPT-4 y técnicas avanzadas de generación de datos sintéticos para igualar el rendimiento de modelos mucho mayores, demostrando capacidades de razonamiento y matemáticas excepcionales con una huella energética reducida.
+\end{itemize}
+
+\subsection{Impacto del uso masivo en infraestructuras: Una mirada desde la industria}
+
+El aspecto más pragmático del consumo energético en IA no siempre se encuentra en los artículos académicos, sino en las reacciones de las empresas ante demandas operativas reales\@. Un claro ejemplo aparece cuando \textcite{altman2024gpus}, CEO de OpenAI, comunicó a través de su cuenta oficial de X.com las consecuencias inmediatas del lanzamiento de la funcionalidad de generación de imágenes en ChatGPT:
+
+\begin{quote}
+``Es súper divertido ver cómo la gente adora las imágenes en ChatGPT\@. Pero nuestras GPUs se están derritiendo\@. Vamos a introducir temporalmente algunos límites de uso mientras trabajamos para hacerlo más eficiente\@. ¡Esperamos que no sea por mucho tiempo! El nivel gratuito de ChatGPT pronto tendrá 3 generaciones [de imágenes] por día\@.''
+\end{quote}
+
+Este mensaje, publicado el 7 de octubre de 2024, ilustra vívidamente cómo el entusiasmo y adopción masiva de tecnologías generativas puede provocar picos de demanda energética que desafían incluso las infraestructuras más robustas. La metáfora de ``GPUs derritiéndose'' revela tanto el estrés térmico como el energético, subrayando la necesidad crítica de sistemas de refrigeración por agua cada vez más potentes en los centros de datos.
+
+La introducción de límites de uso (3 generaciones diarias para usuarios gratuitos) representa una respuesta directa al equilibrio necesario entre accesibilidad del servicio y sostenibilidad operacional. Este tipo de decisiones refleja una realidad pocas veces discutida en la literatura técnica: la tensión entre la democratización de las tecnologías de IA y sus consecuencias energético-ambientales cuando son adoptadas a escala global por millones de usuarios simultáneamente.
+
+\subsection{Reducción de emisiones de carbono en modelos de IA}
+
+\textcite{patterson2021carbon} proporcionan un análisis integral de las emisiones de carbono asociadas al entrenamiento de grandes modelos neuronales, destacando la contribución de múltiples factores en la huella ambiental. Los autores presentan una fórmula simplificada para calcular dicha huella:
+
+\begin{equation}
+\text{Huella} = (E_{\text{entrenamiento}} + \text{consultas} \times E_{\text{inferencia}}) \times \text{CO}_2\text{e}_{\text{datacentro}}/\text{kWh}
+\end{equation}
+
+Donde $E$ representa la energía eléctrica consumida y $\text{CO}_2\text{e}$ las emisiones equivalentes de dióxido de carbono. Un hallazgo clave es que, contrario a la percepción popular que enfoca la atención en el entrenamiento, aproximadamente el 80-90\% del consumo energético en modelos de IA ocurre durante la fase de inferencia (según estimaciones de NVIDIA y Amazon Web Services). Esto destaca la importancia de optimizar no solo el proceso de entrenamiento, sino también la eficiencia durante la implementación productiva.
+
+Un caso de estudio comparativo entre diferentes infraestructuras revela mejoras sustanciales en la huella de carbono: utilizando el modelo Evolved Transformer (Medium) en TPUs v2 de Google en un centro de datos en Iowa, las emisiones netas se redujeron a solo 0.0024 toneladas métricas de CO$_2$e, comparado con 0.1357 toneladas métricas para Transformer (Big) en GPUs P100 en un centro de datos promedio estadounidense. Esta reducción del 98\% se debe a la combinación de cuatro factores principales:
+
+\begin{itemize}
+    \item \textbf{Arquitectura del modelo:} Evolved Transformer requiere 38\% menos cálculos para lograr la misma precisión que Transformer (Big).
+    
+    \item \textbf{Hardware especializado:} Las TPU v2 son 5.6-6.2 veces más eficientes en rendimiento/vatio que las GPU P100, combinando mayor velocidad de procesamiento (4.3-5.2×) con menor consumo energético (1.2-1.3×).
+    
+    \item \textbf{Eficiencia del centro de datos:} El PUE (Power Usage Effectiveness) de 1.11 en el centro de datos de Google en Iowa representa una mejora de 1.4× sobre el promedio estadounidense de 1.59.
+    
+    \item \textbf{Combinación energética limpia:} La estrategia 24/7 de energía libre de carbono reduce la intensidad de carbono de 0.429 kg CO$_2$e/kWh (promedio EE.UU.) a 0.080 kg CO$_2$e/kWh (neto en Iowa), una mejora de 5.4×.
+\end{itemize}
+
+Estas mejoras reflejan una tendencia más amplia hacia la eficiencia energética en centros de datos, donde a pesar del aumento del 550\% en la capacidad de cómputo global entre 2010-2020, el consumo energético solo creció un 6\%, según investigaciones publicadas en Science.
+
+\subsection{Sistemas predictivos y recomendaciones para optimización energética}
+
+\textcite{girija2024ai} presentan un sistema de predicción de consumo energético basado en inteligencia artificial que integra modelos avanzados de machine learning para pronosticar patrones de consumo y ofrecer recomendaciones personalizadas de optimización. El sistema alcanza una precisión notable con una puntuación R² de 0.92 y logra reducir errores de predicción entre un 5-10\% respecto a métodos convencionales. 
+
+La arquitectura del sistema se estructura en cuatro componentes principales:
+
+\begin{itemize}
+    \item \textbf{Módulo de predicción energética}: Genera pronósticos de consumo en diferentes escalas temporales (horarios, diarios y semanales) mediante modelos entrenados que se actualizan dinámicamente con datos en tiempo real, permitiendo ajustes continuos basados en factores externos.
+    
+    \item \textbf{Motor de recomendaciones}: Categoriza el consumo en cuatro niveles (bajo, moderado, alto y crítico) y proporciona recomendaciones específicas para cada nivel, desde mejoras de eficiencia hasta alertas para gestión de demanda en momentos críticos.
+    
+    \item \textbf{Interfaz de usuario y visualización}: Implementada con Streamlit, ofrece un dashboard interactivo que permite a los usuarios comprender tendencias de consumo, recibir alertas automáticas sobre patrones extremos y exportar datos para análisis adicionales.
+    
+    \item \textbf{Adaptabilidad y escalabilidad}: El sistema es aplicable tanto en entornos residenciales como comerciales e industriales, con posibilidad de integración con dispositivos IoT y despliegue en plataformas cloud para analítica en tiempo real.
+\end{itemize}
+
+Esta aproximación representa un avance significativo en la intersección entre inteligencia artificial y gestión energética, utilizando modelos como Random Forest, KNN, ARIMA y LSTM para identificar patrones de consumo y ofrecer estrategias de optimización personalizadas que contribuyen a la sostenibilidad energética.
+
+\subsection{Generación de video con IA: Un nuevo horizonte de consumo energético}
+
+La evolución hacia modalidades más complejas de generación con IA, como la creación de videos, está estableciendo nuevos umbrales de consumo energético que requieren atención particular. Según investigaciones de Hugging Face publicadas en MIT Technology Review \cite{luccioni2025ai}, la generación de videos representa un salto cualitativo en términos de demanda energética comparado con la generación de imágenes estáticas.
+
+Un análisis realizado con Code Carbon sobre el modelo CogVideoX (desarrollado por Zhipu AI y la Universidad Tsinghua) reveló que la versión mejorada del modelo lanzada a finales de 2024 consumía aproximadamente 3.4 millones de joules para producir un video de cinco segundos a 16 fotogramas por segundo. Este consumo representa:
+
+\begin{itemize}
+    \item Más de 30 veces la energía requerida por la versión anterior del mismo modelo (que generaba videos a solo 8 fps)
+    \item Aproximadamente 700 veces la energía necesaria para generar una única imagen de alta calidad
+    \item El equivalente energético de recorrer 38 millas en una bicicleta eléctrica
+    \item La misma energía consumida por un horno microondas funcionando durante más de una hora
+\end{itemize}
+
+Es razonable inferir que modelos cerrados de empresas como OpenAI (Sora), Google (Veo2) o Adobe (Firefly), que generan videos de mayor duración (hasta 30 segundos), mayor resolución y fidelidad visual significativamente superior, presentan demandas energéticas considerablemente mayores. Además, las capacidades avanzadas como la edición selectiva de elementos específicos dentro del video y la combinación de múltiples tomas aumentan aún más la huella energética.
+
+Esta tendencia plantea cuestiones críticas sobre la escalabilidad sostenible de estas tecnologías. Si bien representantes de la industria han argumentado que la generación de video por IA podría tener una huella ambiental menor que la producción cinematográfica tradicional (considerando viajes, equipos y locaciones), esta comparación resulta difícil de validar empíricamente y no contempla el potencial aumento exponencial en la producción de contenido que podría derivarse de la democratización y abaratamiento de estas tecnologías.

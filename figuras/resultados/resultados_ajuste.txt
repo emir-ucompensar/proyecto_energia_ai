@@ -1,0 +1,35 @@
+================================================================================
+RESULTADOS DEL ANÁLISIS DE REGRESIÓN Y ÁREA BAJO LA CURVA
+================================================================================
+
+MEJOR MODELO ENCONTRADO:
+--------------------------------------------------------------------------------
+Tipo: polinomial_4
+Ecuación: Polinomial grado 4: y = -0.001x^4 + ...
+R² (coeficiente de determinación): 1.00000000
+Parámetros: [-5.31903871e-04  4.83321190e-02 -6.03669538e-01  3.18849201e+00
+  8.85954764e+00]
+
+ÁREA BAJO LA CURVA (Z):
+--------------------------------------------------------------------------------
+Z = ∫[1.10, 8.00] f(x) dx
+Z = 104.4638309122
+
+INTERPRETACIÓN:
+--------------------------------------------------------------------------------
+El área bajo la curva Z = 104.464 representa el consumo energético
+acumulado integrado sobre el rango de tamaños de modelos evaluados
+(1.1B a 8.0B parámetros).
+
+TODOS LOS MODELOS EVALUADOS:
+--------------------------------------------------------------------------------
+1. polinomial_4         | R² = 1.000000
+2. polinomial_5         | R² = 1.000000
+3. polinomial_3         | R² = 0.999989
+4. potencial            | R² = 0.988729
+5. logaritmico          | R² = 0.987225
+6. polinomial_2         | R² = 0.985416
+7. polinomial_1         | R² = 0.981552
+8. exponencial          | R² = 0.981546
+
+================================================================================

@@ -1,0 +1,130 @@
+\section{Metodología}
+\textit{¿Qué voy a hacer?}
+
+\subsection{Justificación de la alternativa seleccionada}
+
+La presente investigación adopta un \textbf{enfoque híbrido} que integra dos metodologías complementarias del cálculo integral: modelado analítico mediante antiderivadas e integración numérica mediante métodos de Trapecio y Simpson. Esta combinación estratégica responde a la necesidad de balancear precisión teórica con aplicabilidad práctica.
+
+\subsubsection*{Razón 1: Alineación con el Framework Matemático}
+
+Nuestro framework establece una correspondencia directa entre conceptos del cálculo integral y medición energética (Tabla~\ref{tab:framework}):
+
+\begin{itemize}
+    \item Variable independiente $X$ = Tiempo $t$ (segundos) durante inferencia
+    \item Variable dependiente $Y$ = Potencia instantánea $P(t)$ (watts)
+    \item Función a integrar $f(x)$ = Perfil de potencia $P(t)$
+    \item Resultado $Z$ = Energía total $E = \int_a^b P(t)\,dt$ (Joules)
+\end{itemize}
+
+El enfoque híbrido aprovecha esta estructura: primero modelamos analíticamente $P(t)$ como función polinómica o exponencial (Alternativa 1), luego validamos con datos discretos reales mediante integración numérica (Alternativa 2). Esto incrementa la confiabilidad de nuestras conclusiones.
+
+\subsubsection*{Razón 2: Precisión Mediante Doble Validación}
+
+Usando ambas metodologías logramos:
+
+\begin{enumerate}
+    \item \textbf{Modelo Analítico (Antiderivadas):} Proporciona una solución teórica exacta $E = F(b) - F(a)$ que actúa como punto de referencia cuando $P(t)$ puede aproximarse por funciones elementales.
+    
+    \item \textbf{Métodos Numéricos (Simpson y Trapecio):} Permiten integrar datos discretos reales de sensores de GPU/CPU sin necesidad de asumir una forma funcional específica, reduciendo el sesgo de modelado.
+    
+    \item \textbf{Comparación Cruzada:} Calculamos el error relativo entre ambos métodos: $\text{Error}(\%) = 100 \cdot \frac{|E_{\text{analítico}} - E_{\text{numérico}}|}{E_{\text{analítico}}}$. Errores pequeños ($< 5\%$) validan la confiabilidad de la metodología.
+\end{enumerate}
+
+\subsubsection*{Razón 3: Metodologías Numéricas Apropiadas para Datos Reales}
+
+La integración de datos de consumo energético en centros de datos produce series temporales discretas, no funciones continuas. Por esto, Simpson y Trapecio son ideales porque:
+
+\begin{itemize}
+    \item \textbf{Trapecio:} Aproximación lineal entre puntos, rápida de implementar, bajo costo computacional.
+    \item \textbf{Simpson:} Aproximación polinómica de segundo orden, mayor precisión, control de error refinando particiones.
+    \item Ambos permiten análisis de convergencia ajustando el número de intervalos $n$.
+\end{itemize}
+
+\subsection{Alineación con contenidos temáticos del curso}
+
+El curso de Cálculo Integral prescribe los siguientes contenidos temáticos, todos los cuales se integran directamente en nuestra metodología:
+
+\begin{table}[H]
+    \centering
+    \caption{Mapeo entre contenidos temáticos y metodología híbrida seleccionada.}
+    \label{tab:contenidos}
+    \begin{tabular}{p{4cm}p{5.5cm}p{4cm}}
+    \toprule
+    \textbf{Contenido Temático} & \textbf{Aplicación en Metodología} & \textbf{Etapa del Proyecto} \\
+    \midrule
+    Antiderivada, Integral Indefinida & Modelado analítico de $P(t)$ como polinomio; cálculo de $F(t)$ & Alternativa 1 \\
+    \midrule
+    Métodos de integración (sustitución, partes) & Simplificación algebraica de expresiones de $P(t)$ & Alternativa 1 \\
+    \midrule
+    Integral Definida & Evaluación de $E = \int_a^b P(t)\,dt$ en intervalos de inferencia & Ambas \\
+    \midrule
+    Integral Numérica (Trapecio) & Aproximación de energía con datos discretos & Alternativa 2 \\
+    \midrule
+    Integral Numérica (Simpson) & Aproximación de energía con mayor precisión & Alternativa 2 \\
+    \midrule
+    Análisis de convergencia & Refinamiento de $n$ hasta error aceptable $< 3\%$ & Validación \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Comparativa de métodos de integración aplicables}
+
+\subsubsection*{Alternativa 1: Modelado Analítico (Antiderivadas)}
+
+Cuando el perfil de potencia admite una forma funcional explícita, utilizamos antiderivadas. Un modelo típico es:
+
+\begin{equation}
+P(t) = P_0 + \alpha t + \beta t^2
+\end{equation}
+
+donde $P_0$ es potencia base, $\alpha$ y $\beta$ son coeficientes empíricos. La antiderivada es:
+
+\begin{equation}
+F(t) = P_0 t + \frac{\alpha}{2}t^2 + \frac{\beta}{3}t^3
+\end{equation}
+
+El consumo en $[a,b]$ es exacto:
+
+\begin{equation}
+E_{[a,b]} = F(b) - F(a)
+\end{equation}
+
+\textbf{Ventajas:} Exactitud, bajo costo computacional, fórmulas cerradas para análisis de sensibilidad.
+
+\textbf{Limitaciones:} Requiere asumir una forma funcional; no captura dinámicas complejas.
+
+\subsubsection*{Alternativa 2: Integración Numérica (Simpson y Trapecio)}
+
+Dados $n+1$ puntos $(t_i, P_i)$ con $i = 0, 1, \ldots, n$ donde $t_0 = a$ y $t_n = b$:
+
+\textbf{Regla del Trapecio Compuesta:}
+
+\begin{equation}
+E_{\text{Trap}} = \frac{h}{2} \left[ P_0 + 2\sum_{i=1}^{n-1} P_i + P_n \right]
+\end{equation}
+
+donde $h = \frac{b-a}{n}$ es el espaciado.
+
+\textbf{Regla de Simpson Compuesta} (para $n$ par):
+
+\begin{equation}
+E_{\text{Simp}} = \frac{h}{3} \left[ P_0 + 4\sum_{i=1,3,5}^{n-1} P_i + 2\sum_{i=2,4,6}^{n-2} P_i + P_n \right]
+\end{equation}
+
+\textbf{Ventajas:} Aplicable a datos discretos arbitrarios, control de error, convergencia verificable.
+
+\textbf{Limitaciones:} Aproximación, requiere datos uniformemente espaciados (o interpolación).
+
+\subsubsection*{Validación Cruzada}
+
+En fase de implementación, calcularemos ambas estimaciones ($E_{\text{analítico}}$ y $E_{\text{numérico}}$) sobre los mismos datos. La consistencia entre métodos (error $< 5\%$) validará la confiabilidad del análisis energético.
+
+\subsubsection*{Alternativa 3: Integración para Comparación de Políticas}
+
+Una vez tengamos estimaciones precisas de consumo base, aplicaremos la misma metodología numérica a escenarios alternativos (e.~g., reduced precision, batch sizes diferentes) calculando:
+
+\begin{equation}
+\Delta E = \int_a^b [P_{\text{base}}(t) - P_{\text{política}}(t)]\,dt
+\end{equation}
+
+Esto cuantifica ahorros energéticos con la misma precisión que el modelo base.
