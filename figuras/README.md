@@ -1,80 +1,175 @@
-# Directorio de Figuras - Estructura Organizada
+# Directorio de Figuras
+## Visualizaciones del Proyecto - Método de Rectángulos
 
-Este directorio contiene todas las visualizaciones generadas para el proyecto de análisis energético de modelos de IA.
+Este directorio contiene las 45 visualizaciones generadas por el proyecto de análisis energético usando el método de los rectángulos (sumas de Riemann).
 
 ## Estructura del Directorio
 
 ```
 figuras/
-├── png/               # Imágenes PNG (300 DPI) para LaTeX
-├── pdf/               # Gráficos vectoriales PDF de alta calidad
-├── resultados/        # Archivos de texto con resultados numéricos
-└── README.md          # Este archivo
+├── resultados/        # 45 gráficos PNG generados por los scripts
+├── png/              # (vacío - reservado para uso futuro)
+├── pdf/              # (vacío - reservado para uso futuro)
+└── README.md         # Este archivo
 ```
 
-## Contenido
+## Contenido - 45 Visualizaciones
 
-### PNG (Para documento LaTeX)
-Imágenes rasterizadas de 300 DPI optimizadas para inclusión en el documento LaTeX:
-- `grafico_1_eficiencia_barras.png` - Comparación de eficiencia energética (252 KB)
-- `grafico_2_dispersion_tamano_consumo.png` - Correlación tamaño-consumo (319 KB)
-- `grafico_3_potencia_tiempo.png` - Perfiles temporales de potencia (971 KB)
-- `grafico_4_pareto_tradeoff.png` - Análisis de frontera Pareto (302 KB)
-- `grafico_5_comparacion_metodos_numericos.png` - Convergencia de métodos (511 KB)
-- `grafico_6_area_bajo_curva.png` - Regresión y área Z (484 KB)
+### Grupo 1: Visualizaciones Detalladas (27 gráficos)
+Generadas por `rectangulos_visualizacion.py`
 
-### PDF (Gráficos vectoriales)
-Versiones de alta calidad en formato vectorial para presentaciones y publicaciones:
-- `grafico_1_eficiencia_barras.pdf` - 28 KB
-- `grafico_2_dispersion_tamano_consumo.pdf` - 36 KB
-- `grafico_3_potencia_tiempo.pdf` - 42 KB
-- `grafico_4_pareto_tradeoff.pdf` - 42 KB
-- `grafico_5_comparacion_metodos_numericos.pdf` - 49 KB
-- `grafico_6_area_bajo_curva.pdf` - 54 KB
+**Por densidad y modo (9 configuraciones básicas)**:
+- `rectangulos_left_n10.png`, `rectangulos_left_n100.png`, `rectangulos_left_n1000.png`
+- `rectangulos_mid_n10.png`, `rectangulos_mid_n100.png`, `rectangulos_mid_n1000.png`
+- `rectangulos_right_n10.png`, `rectangulos_right_n100.png`, `rectangulos_right_n1000.png`
 
-### Resultados
-Archivos de texto con resultados numéricos detallados:
-- `resultados_ajuste.txt` - Análisis completo de regresión y área bajo la curva
+**Con modelos de IA posicionados (3 gráficos)**:
+- `rectangulos_left_modelos.png`
+- `rectangulos_mid_modelos.png`
+- `rectangulos_right_modelos.png`
+
+**Con tablas de resultados (3 gráficos)**:
+- `rectangulos_left_tabla.png`
+- `rectangulos_mid_tabla.png`
+- `rectangulos_right_tabla.png`
+
+**Visualizaciones combinadas (12 gráficos adicionales)**:
+- Comparativas de densidades
+- Análisis de convergencia
+- Zooms y detalles
+
+### Grupo 2: Análisis Comparativo (18 gráficos)
+Generados por `comparativa_modelos.py`
+
+**Comparativas por densidad (6 gráficos)**:
+- `comparativa_n10.png`, `comparativa_n100.png`, `comparativa_n1000.png`
+- `comparativa_n10_zoom.png`, `comparativa_n100_zoom.png`, `comparativa_n1000_zoom.png`
+
+**Análisis de convergencia (6 gráficos)**:
+- `comparativa_convergencia_left.png`
+- `comparativa_convergencia_mid.png`
+- `comparativa_convergencia_right.png`
+- `comparativa_convergencia_todas.png`
+- `comparativa_convergencia_errores.png`
+- `comparativa_convergencia_log.png`
+
+**Análisis de modelos y precisión (6 gráficos)**:
+- `comparativa_todos_modos.png`
+- `comparativa_todos_modos_zoom.png`
+- `comparativa_modelos_barras.png`
+- `comparativa_precision_modos.png`
+- `comparativa_tiempos_ejecucion.png`
+- `tabla_convergencia.png`
+
+## Especificaciones Técnicas
+
+### Formato
+- **Tipo**: PNG
+- **Resolución**: 300 DPI
+- **Tamaño típico**: 200-500 KB por gráfico
+- **Dimensiones**: 1200×800 px (estándar), 1400×1000 px (gráficos grandes)
+
+### Paleta de Colores
+- **Curva E(N)**: #C62828 (rojo)
+- **Rectángulos izquierda**: #1976D2 (azul)
+- **Rectángulos punto medio**: #388E3C (verde)
+- **Rectángulos derecha**: #F57C00 (naranja)
+- **Modelos de IA**: #424242 (gris oscuro)
 
 ## Regeneración de Gráficos
 
-Para regenerar todos los gráficos:
+### Opción 1: Menú Interactivo (Recomendado)
+```bash
+cd ../scripts
+python3 launcher.py
+# Seleccionar:
+# 2 - Generar visualizaciones detalladas (27 gráficos)
+# 3 - Generar análisis comparativo (18 gráficos)
+# 5 - Ejecutar análisis completo (45 gráficos)
+```
+
+### Opción 2: Scripts Individuales
+```bash
+cd ../scripts
+
+# Generar 27 visualizaciones detalladas
+python3 rectangulos_visualizacion.py
+
+# Generar 18 análisis comparativos
+python3 comparativa_modelos.py
+```
+
+### Tiempo de Generación
+- **Visualizaciones detalladas**: ~15 segundos
+- **Análisis comparativo**: ~12 segundos
+- **Total (45 gráficos)**: ~30 segundos
+
+## Uso en LaTeX
+
+Los gráficos se incluyen automáticamente en `main.tex` mediante:
+
+```latex
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figuras/resultados/rectangulos_mid_n100.png}
+    \caption{Método de rectángulos con punto medio, n=100}
+    \label{fig:rectangulos_mid_n100}
+\end{figure}
+```
+
+## Gráficos Clave para el Documento
+
+### Principales (incluidos en LaTeX)
+1. `rectangulos_mid_n100.png` - Mejor balance precisión/visualización
+2. `rectangulos_mid_modelos.png` - Modelos de IA en la curva
+3. `comparativa_convergencia_mid.png` - Análisis de convergencia
+4. `comparativa_todos_modos.png` - Comparación entre modos
+5. `comparativa_precision_modos.png` - Precisión por configuración
+
+### Complementarios (para análisis detallado)
+- Todas las variaciones de densidad (n=10, 100, 1000)
+- Gráficos con tablas numéricas
+- Análisis de errores y tiempos de cómputo
+
+## Validación
+
+Para verificar la integridad de las visualizaciones:
 
 ```bash
 cd ../scripts
-python3 generar_todos_graficos.py
+python3 verificar_fixes.py
 ```
 
-Para regenerar un gráfico individual:
-
-```bash
-cd ../scripts
-python3 grafico_1_eficiencia_barras.py  # Ejemplo para gráfico 1
-```
-
-## Configuración
-
-Todos los gráficos se generan usando la configuración centralizada en `scripts/config.py`:
-- **Resolución PNG:** 300 DPI
-- **Tamaño figura:** 12×8 pulgadas (gráficos estándar), 14×10 (gráficos grandes)
-- **Estilo:** seaborn-v0_8-darkgrid
-- **Paleta de colores:** Personalizada de 5 colores
-
-## Notas
-
-- Los archivos PNG se usan automáticamente en el documento LaTeX (`main.tex`)
-- Los archivos PDF son ideales para presentaciones y escalado sin pérdida de calidad
-- La estructura separada permite mantener organizados formatos múltiples sin duplicación
-- Los gráficos se generan automáticamente desde datos experimentales en `config.py`
+Esto valida:
+- Alineación correcta de modelos con curva E(N)
+- Consistencia de colores
+- Integridad de archivos generados
 
 ## Limpieza
 
 Para eliminar todos los gráficos generados:
 
 ```bash
-rm -rf png/*.png pdf/*.pdf resultados/*.txt
+cd figuras/resultados
+rm -f *.png
 ```
 
+Luego regenerar con:
+```bash
+cd ../../scripts
+python3 launcher.py  # Opción 5
+```
+
+## Notas
+
+- Todos los gráficos son determinísticos (sin aleatoriedad)
+- Los archivos PNG están optimizados para LaTeX (300 DPI)
+- Los directorios `png/` y `pdf/` están reservados para uso futuro
+- La carpeta `resultados/` contiene todas las visualizaciones actuales
+
 ---
-**Última actualización:** Octubre 2025  
-**Scripts relacionados:** `../scripts/grafico_*.py`, `../scripts/config.py`
+
+**Total de visualizaciones**: 45 gráficos PNG  
+**Scripts generadores**: `rectangulos_visualizacion.py` (27) + `comparativa_modelos.py` (18)  
+**Última actualización**: Noviembre 2025  
+**Versión**: 2.0.0

@@ -1,336 +1,255 @@
-# Scripts de Análisis Gráfico
-## Proyecto: Análisis Energético de Modelos de IA con Cálculo Integral
+# Scripts del Proyecto
+## Análisis Energético de Modelos de IA con Método de Rectángulos
 
-Este directorio contiene scripts Python modulares y documentados para generar todos los análisis gráficos del proyecto.
+Este directorio contiene los scripts Python del proyecto que implementan el método de los rectángulos (sumas de Riemann) para calcular el consumo energético acumulado de modelos de IA.
 
-## [DIR] Estructura de Archivos
+## Estructura de Archivos
 
 ```
 scripts/
-├── config.py                              # Configuración centralizada
-├── grafico_1_eficiencia_barras.py         # Comparación eficiencia energética
-├── grafico_2_dispersion_tamano_consumo.py # Relación tamaño vs consumo
-├── grafico_3_potencia_tiempo.py           # Perfiles de potencia temporal
-├── grafico_4_pareto_tradeoff.py           # Análisis Pareto multi-objetivo
-├── grafico_5_comparacion_metodos_numericos.py # Trapecio vs Simpson
-├── grafico_6_area_bajo_curva.py           # Regresión y área Z
-├── generar_todos_graficos.py              # Script maestro
-└── README.md                              # Este archivo
+├── integrales_numericas.py        # Clase IntegracionNumerica con método rectangulos()
+├── rectangulos.py                 # Implementación del método de rectángulos
+├── rectangulos_visualizacion.py   # Genera 27 visualizaciones detalladas
+├── comparativa_modelos.py         # Genera 18 visualizaciones comparativas
+├── antiderivada.py                # Cálculo de integral exacta (antiderivada)
+├── launcher.py                    # Menú interactivo principal
+├── trapecio.py                    # Script legacy (no usado)
+├── simpson.py                     # Script legacy (no usado)
+├── verificar_fixes.py             # Validación de correcciones visuales
+└── README.md                      # Este archivo
 ```
 
-## [RUN] Inicio Rápido
-
-### [PKG] Instalación de Dependencias (NUEVO)
-
-**Método 1: Script Python Interactivo (Recomendado)**
-
-```bash
-python3 instalar_dependencias.py
-```
-
-El script detecta automáticamente tu sistema y ofrece las mejores opciones:
-- [OK] Crear entorno virtual (recomendado para desarrollo)
-- [OK] Instalar con APT (Ubuntu/Debian, requiere sudo)
-- [OK] Instalar con pip --user (sin sudo)
-
-**Método 2: Script Bash (Rápido)**
-
-```bash
-chmod +x instalar_dependencias.sh
-./instalar_dependencias.sh
-```
-
-**Método 3: Manual - Entorno Virtual**
-
-```bash
-# Crear entorno virtual
-python3 -m venv ../venv
-
-# Activar
-source ../venv/bin/activate  # Linux/Mac
-# ..\venv\Scripts\activate  # Windows
-
-# Instalar dependencias
-pip install numpy>=1.24.0 scipy>=1.10.0 matplotlib>=3.7.0 pandas>=2.0.0
-pip install psutil  # Opcional
-```
-
-**Método 4: APT (Ubuntu/Debian)**
-
-```bash
-sudo apt update
-sudo apt install -y python3-numpy python3-scipy python3-matplotlib python3-pandas
-```
+## Inicio Rápido
 
 ### Requisitos del Sistema
 
-- **Python** >= 3.8
-- **NumPy** >= 1.24.0 - Cálculos numéricos
-- **SciPy** >= 1.10.0 - Integración numérica (trapezoid, simpson)
-- **Matplotlib** >= 3.7.0 - Visualización
-- **pandas** >= 2.0.0 - Análisis de datos y exportación CSV
-- **psutil** (opcional) - Monitoreo del sistema
+- **Python** >= 3.10
+- **NumPy** >= 1.24.0 - Cálculos numéricos y arrays
+- **Matplotlib** >= 3.7.0 - Visualización de gráficos
+- **SciPy** >= 1.10.0 - Funciones de integración
+- **Pandas** >= 2.0.0 - Análisis de datos
 
-### Ejecución Individual
-
-```bash
-# Si usaste entorno virtual, activalo primero
-source ../venv/bin/activate
-
-# Navegar al directorio
-cd scripts/
-
-# Ejecutar un script específico
-python grafico_1_eficiencia_barras.py
-```
-
-### Ejecución Completa
+### Instalación de Dependencias
 
 ```bash
-# Generar todos los gráficos automáticamente
-python generar_todos_graficos.py
+pip install numpy>=1.24.0 matplotlib>=3.7.0 scipy>=1.10.0 pandas>=2.0.0
 ```
 
-Los gráficos se guardarán en `../figuras/` en formatos PNG y PDF.
+### Ejecución
 
-## [STATS] Descripción de Scripts
-
-### 1. `config.py`
-**Propósito**: Configuración centralizada de parámetros.
-
-**Configurables**:
-- Datos experimentales de modelos
-- Duración de simulaciones
-- Parámetros de métodos numéricos
-- Configuración de visualización (colores, tamaños, DPI)
-- Rutas de salida
-
-**Uso**: Importado por todos los demás scripts.
-
-```python
-from config import MODELOS, TAMANO_FIGURA, DPI
-```
-
----
-
-### 2. `grafico_1_eficiencia_barras.py`
-**Propósito**: Gráfico de barras comparativo de eficiencia energética (tokens/Wh).
-
-**Salidas**:
-- `grafico_1_eficiencia_barras.png`
-- `grafico_1_eficiencia_barras.pdf`
-
-**Parámetros configurables en `config.py`**:
-- `MODELOS['eficiencia']`: Valores de eficiencia
-- `COLORES`: Paleta de colores
-
-**Métricas mostradas**:
-- Eficiencia por modelo (tokens/Wh)
-- Energía total consumida
-- Promedio de eficiencia
-
----
-
-### 3. `grafico_2_dispersion_tamano_consumo.py`
-**Propósito**: Correlación entre tamaño del modelo y consumo energético con ajuste potencial.
-
-**Salidas**:
-- `grafico_2_dispersion_tamano_consumo.png`
-- `grafico_2_dispersion_tamano_consumo.pdf`
-
-**Análisis incluido**:
-- Ajuste de curva potencial: E = a × N^b
-- Cálculo de R²
-- Coeficiente de correlación
-
-**Parámetros configurables**:
-- `MODELOS['parametros']`: Tamaños de modelos
-- `MODELOS['energia_total']`: Consumos medidos
-
----
-
-### 4. `grafico_3_potencia_tiempo.py`
-**Propósito**: Simulación de perfiles de potencia GPU en el tiempo.
-
-**Salidas**:
-- `grafico_3_potencia_tiempo.png`
-- `grafico_3_potencia_tiempo.pdf`
-
-**Características**:
-- Fase de warmup exponencial
-- Oscilaciones por ciclos de carga
-- Ruido estocástico realista
-- Picos ocasionales de carga
-
-**Parámetros configurables**:
-- `DURACION_SIMULACION`: Duración total (default: 600s)
-- `NUM_PUNTOS`: Resolución temporal (default: 600)
-- `PERFIL_CONFIG`: Parámetros del modelo de potencia
-
-**Modelo matemático**:
-```
-P(t) = P_nom × (1 - e^(-t/τ)) × (1 + A·sin(ωt) + ε(t))
-```
-
----
-
-### 5. `grafico_4_pareto_tradeoff.py`
-**Propósito**: Análisis de Pareto para identificar configuraciones óptimas.
-
-**Salidas**:
-- `grafico_4_pareto_tradeoff.png`
-- `grafico_4_pareto_tradeoff.pdf`
-
-**Análisis**:
-- Identificación de frente de Pareto
-- Trade-off rendimiento vs consumo
-- Clasificación de modelos dominados/óptimos
-
-**Criterio Pareto**:
-Un punto (E_i, T_i) es óptimo si no existe (E_j, T_j) tal que:
-- E_j < E_i AND T_j > T_i
-
----
-
-### 6. `grafico_5_comparacion_metodos_numericos.py`
-**Propósito**: Evaluar precisión de métodos de integración numérica.
-
-**Salidas**:
-- `grafico_5_comparacion_metodos_numericos.png`
-- `grafico_5_comparacion_metodos_numericos.pdf`
-
-**Métodos evaluados**:
-- Regla del Trapecio: O(h²)
-- Regla de Simpson 1/3: O(h⁴)
-
-**Análisis incluido**:
-- Convergencia del error (escala log-log)
-- Tiempo de cómputo
-- Tabla de resultados numéricos
-
-**Parámetros configurables**:
-- `N_INTERVALOS`: Lista de subintervalos a probar
-- `A_LIMITE_INFERIOR`, `B_LIMITE_SUPERIOR`: Límites de integración
-
----
-
-### 7. `grafico_6_area_bajo_curva.py` **PRINCIPAL**
-**Propósito**: Regresión, selección del modelo óptimo y cálculo del área bajo la curva Z.
-
-**Salidas**:
-- `grafico_6_area_bajo_curva.png`
-- `grafico_6_area_bajo_curva.pdf`
-- `resultados_ajuste.txt` (reporte detallado)
-
-**Análisis completo**:
-1. **Regresión**: Prueba 4 familias de funciones
-   - Polinomial (grados 1-5)
-   - Exponencial
-   - Potencial
-   - Logarítmica
-
-2. **Selección**: Basada en R² máximo
-
-3. **Integración definida**: Calcula área Z
-   ```
-   Z = ∫[a,b] f(x) dx
-   ```
-
-4. **Validación**: Análisis de residuos
-
-**Parámetros configurables**:
-- `GRADO_POLINOMIO_MAX`: Grado máximo polinomial (default: 5)
-- `R2_MINIMO`: Umbral mínimo de R² (default: 0.80)
-- `TIPOS_AJUSTE`: Familias de funciones a probar
-
----
-
-### 8. `generar_todos_graficos.py`
-**Propósito**: Script maestro que ejecuta todos los análisis secuencialmente.
-
-**Uso**:
 ```bash
-python generar_todos_graficos.py
+# Menú interactivo principal
+python3 launcher.py
+
+# O ejecutar scripts individuales
+python3 rectangulos.py
+python3 rectangulos_visualizacion.py
+python3 comparativa_modelos.py
 ```
 
-**Características**:
-- Ejecución automática de 6 scripts
-- Manejo de errores con continuación opcional
-- Resumen final de éxitos/fallos
-- Verificación de dependencias
+Los gráficos se guardarán en `../figuras/resultados/` en formato PNG.
+
+## Descripción de Scripts
+
+### 1. `integrales_numericas.py`
+**Clase principal**: `IntegracionNumerica`
+
+Implementa la función energía y el método de integración numérica por rectángulos.
+
+**Función energía**:
+```
+E(N) = 0.0842N⁴ - 1.2156N³ + 6.8934N² - 12.456N + 11.234
+```
+
+**Método principal**: `rectangulos(n, modo='mid')`
+- `n`: Número de subintervalos
+- `modo`: 'left' (izquierda), 'mid' (punto medio), 'right' (derecha)
+
+**Convergencia**:
+- Izquierda/Derecha: O(h)
+- Punto medio: O(h²)
 
 ---
 
-## [TOOL] Personalización de Parámetros
+### 2. `rectangulos.py`
+**Propósito**: Script completo de análisis con método de rectángulos.
 
-### Modificar Datos Experimentales
+**Funcionalidades**:
+- Cálculo de integral con 3 modos y 3 densidades (n=10, 100, 1000)
+- Análisis de convergencia
+- Posicionamiento de 5 modelos de IA en la curva
+- Generación de 9 visualizaciones básicas
 
-Editar `config.py`:
+**Modelos evaluados**:
+- TinyLLaMA-1.1B (1.1B parámetros, 11.7 Wh experimental)
+- Gemma-2B (2.0B, 13.2 Wh)
+- Phi-3 Mini (3.8B, 14.8 Wh)
+- Mistral-7B (7.0B, 16.9 Wh)
+- LLaMA-3 8B (8.0B, 18.3 Wh)
 
-```python
-MODELOS = {
-    'nombres': ['Modelo1', 'Modelo2', 'Modelo3'],
-    'parametros': [1.0, 3.0, 7.0],  # Billones
-    'energia_total': [10.0, 15.0, 20.0],  # Wh
-    # ... más campos
-}
+**Resultados clave**:
+```
+Valor exacto: Z = 167.3302 Wh·B
+Mejor aproximación: 167.3226 Wh·B (n=1000, mid)
+Error relativo: 0.0045%
 ```
 
-### Cambiar Configuración de Gráficos
+---
+
+### 3. `rectangulos_visualizacion.py`
+**Propósito**: Genera 27 visualizaciones detalladas del método de rectángulos.
+
+**Gráficos generados** (9 configuraciones × 3 vistas):
+
+**Por densidad**:
+- `rectangulos_left_n10.png`, `rectangulos_left_n100.png`, `rectangulos_left_n1000.png`
+- `rectangulos_mid_n10.png`, `rectangulos_mid_n100.png`, `rectangulos_mid_n1000.png`
+- `rectangulos_right_n10.png`, `rectangulos_right_n100.png`, `rectangulos_right_n1000.png`
+
+**Con modelos de IA**:
+- `rectangulos_left_modelos.png`, `rectangulos_mid_modelos.png`, `rectangulos_right_modelos.png`
+
+**Con tabla de resultados**:
+- `rectangulos_left_tabla.png`, `rectangulos_mid_tabla.png`, `rectangulos_right_tabla.png`
+
+**Características visuales**:
+- Rectángulos con transparencia 0.3
+- Puntos de evaluación marcados
+- Modelos de IA posicionados en la curva E(N)
+- Colores estandarizados: #1976D2 (left), #388E3C (mid), #F57C00 (right)
+
+---
+
+### 4. `comparativa_modelos.py`
+**Propósito**: Análisis comparativo entre modos y convergencia.
+
+**Gráficos generados** (18 visualizaciones):
+
+**Comparativas por densidad**:
+- `comparativa_n10.png`, `comparativa_n100.png`, `comparativa_n1000.png`
+- `comparativa_n10_zoom.png`, `comparativa_n100_zoom.png`, `comparativa_n1000_zoom.png`
+
+**Análisis de convergencia**:
+- `comparativa_convergencia_left.png`
+- `comparativa_convergencia_mid.png`
+- `comparativa_convergencia_right.png`
+- `comparativa_convergencia_todas.png`
+- `comparativa_convergencia_errores.png`
+- `comparativa_convergencia_log.png`
+
+**Con modelos de IA**:
+- `comparativa_todos_modos.png`
+- `comparativa_todos_modos_zoom.png`
+- `comparativa_modelos_barras.png`
+- `comparativa_precision_modos.png`
+- `comparativa_tiempos_ejecucion.png`
+- `tabla_convergencia.png`
+
+**Análisis incluidos**:
+- Comparación de precisión por modo
+- Tasas de convergencia
+- Tiempos de cómputo
+- Errores absolutos y relativos
+
+---
+
+### 5. `antiderivada.py`
+**Propósito**: Calcula el valor exacto de la integral usando el Teorema Fundamental del Cálculo.
+
+**Antiderivada calculada**:
+```
+F(N) = 0.0842N⁵/5 - 1.2156N⁴/4 + 6.8934N³/3 - 12.456N²/2 + 11.234N
+```
+
+**Resultado exacto**:
+```
+Z = F(8.0) - F(1.1) = 167.33024720 Wh·B
+```
+
+**Uso**: Valor de referencia para validar métodos numéricos.
+
+---
+
+### 6. `launcher.py`
+**Propósito**: Menú interactivo para ejecutar todos los análisis.
+
+**Opciones del menú**:
+1. Ejecutar análisis básico con rectángulos
+2. Generar visualizaciones detalladas (27 gráficos)
+3. Generar análisis comparativo (18 gráficos)
+4. Calcular valor exacto (antiderivada)
+5. Ejecutar análisis completo (todo lo anterior)
+6. Ver información del proyecto
+7. Verificar correcciones visuales
+8. Salir
+
+**Uso recomendado**: Punto de entrada principal para el proyecto.
+
+---
+
+### 7. `verificar_fixes.py`
+**Propósito**: Validar que las correcciones visuales se aplicaron correctamente.
+
+**Verificaciones**:
+- Alineación de modelos con curva E(N)
+- Consistencia de paleta de colores
+- Integridad de estructura de datos
+
+**Salida**: Reporte de validación completo.
+
+---
+
+### 8. Scripts Legacy
+`trapecio.py` y `simpson.py` se mantienen por compatibilidad pero ya no se usan en el proyecto actual.
+
+---
+
+## Paleta de Colores Estandarizada
 
 ```python
-# Tamaño de figuras (pulgadas)
-TAMANO_FIGURA = (14, 10)  # Default: (12, 8)
-
-# Resolución
-DPI = 600  # Default: 300
-
-# Colores personalizados
 COLORES = {
-    'principal': '#FF5733',
-    # ...
-}
-```
-
-### Ajustar Parámetros de Simulación
-
-```python
-# Duración (segundos)
-DURACION_SIMULACION = 1200  # Default: 600
-
-# Puntos de muestreo
-NUM_PUNTOS = 1200  # Default: 600
-
-# Warmup time (segundos)
-PERFIL_CONFIG = {
-    'warmup_time': 60,  # Default: 30
-    # ...
+    'curva': '#C62828',      # Rojo - Curva E(N)
+    'left': '#1976D2',       # Azul - Rectángulos izquierda
+    'mid': '#388E3C',        # Verde - Rectángulos punto medio
+    'right': '#F57C00',      # Naranja - Rectángulos derecha
+    'modelos': '#424242'     # Gris oscuro - Modelos de IA
 }
 ```
 
 ---
 
-## [UP] Interpretación de Resultados
+## Interpretación de Resultados
 
-### Eficiencia Energética (Gráfico 1)
-- **Valores altos** (>1500 tokens/Wh): Modelos muy eficientes
-- **Valores medios** (800-1500): Eficiencia moderada
-- **Valores bajos** (<800): Modelos menos eficientes
+### Convergencia del Método
 
-### R² en Regresión (Gráfico 6)
-- **R² > 0.95**: Ajuste excelente
-- **R² 0.80-0.95**: Ajuste bueno
-- **R² < 0.80**: Ajuste pobre, considerar otro modelo
+**Error relativo por densidad** (modo mid):
+- n=10: 0.9282% (aceptable para análisis preliminar)
+- n=100: 0.0045% (excelente precisión)
+- n=1000: 0.0002% (precisión extrema)
 
-### Área bajo la Curva Z
-Representa el consumo energético acumulado integrado sobre el rango de tamaños evaluados.
+**Recomendación**: n=100 con modo mid ofrece el mejor balance precisión/cómputo.
 
-**Unidades**: Wh·B (watt-hora × billones de parámetros)
+### Comparación entre Modos
 
-**Interpretación**:
-- Métrica holística de consumo en el espectro completo
-- Útil para benchmarking entre infraestructuras
-- Permite comparaciones normalizadas
+**Precisión** (para n=100):
+- Punto medio (mid): Error 0.0045%
+- Izquierda (left): Error 0.4626%
+- Derecha (right): Error 0.4682%
+
+**Convergencia teórica confirmada**:
+- Mid: O(h²) - convergencia cuadrática
+- Left/Right: O(h) - convergencia lineal
+
+### Posicionamiento de Modelos
+
+Los 5 modelos de IA se posicionan en la curva E(N):
+- TinyLLaMA-1.1B → E(1.1) = 6.39 Wh (experimental: 11.7 Wh)
+- Gemma-2B → E(2.0) = 11.50 Wh (experimental: 13.2 Wh)
+- Phi-3 Mini → E(3.8) = 14.61 Wh (experimental: 14.8 Wh)
+- Mistral-7B → E(7.0) = 16.29 Wh (experimental: 16.9 Wh)
+- LLaMA-3 8B → E(8.0) = 16.91 Wh (experimental: 18.3 Wh)
+
+**Discrepancia**: Los valores experimentales son sistemáticamente mayores, sugiriendo overhead operacional no modelado.
 
 ---
 
@@ -338,122 +257,68 @@ Representa el consumo energético acumulado integrado sobre el rango de tamaños
 
 ### Error: ModuleNotFoundError
 ```bash
-pip install numpy scipy matplotlib
-```
-
-### Error: "config.py not found"
-Asegúrate de ejecutar desde el directorio `/scripts/`:
-```bash
-cd scripts/
-python grafico_X_nombre.py
+pip install numpy>=1.24.0 matplotlib>=3.7.0 scipy>=1.10.0 pandas>=2.0.0
 ```
 
 ### Gráficos no se generan
-Verifica que existe el directorio de salida:
+Verificar directorio de salida:
 ```bash
-mkdir -p ../figuras/
+mkdir -p ../figuras/resultados/
 ```
 
-### Advertencias de matplotlib
-Agregar al inicio del script:
-```python
-import matplotlib
-matplotlib.use('Agg')  # Backend sin GUI
+### Valores inconsistentes
+Ejecutar validación:
+```bash
+python3 verificar_fixes.py
 ```
 
 ---
 
-## Dependencias Detalladas
+## Orden Recomendado de Ejecución
 
-```
-numpy>=1.20.0       # Operaciones numéricas
-scipy>=1.7.0        # Integración y optimización
-matplotlib>=3.4.0   # Visualización
-```
+Para análisis completo:
 
-Instalación completa:
+1. `antiderivada.py` - Calcular valor exacto de referencia
+2. `rectangulos.py` - Análisis básico y primeras 9 visualizaciones
+3. `rectangulos_visualizacion.py` - Visualizaciones detalladas (27 gráficos)
+4. `comparativa_modelos.py` - Análisis comparativo (18 gráficos)
+5. `verificar_fixes.py` - Validar correcciones
+
+O usar el menú interactivo:
 ```bash
-pip install numpy scipy matplotlib
+python3 launcher.py
+# Seleccionar opción 5: "Ejecutar análisis completo"
 ```
 
 ---
 
-## [TARGET] Orden Recomendado de Ejecución
-
-Para generar el reporte completo en orden lógico:
-
-1. `grafico_1_eficiencia_barras.py` - Visión general
-2. `grafico_2_dispersion_tamano_consumo.py` - Correlaciones
-3. `grafico_3_potencia_tiempo.py` - Dinámicas temporales
-4. `grafico_4_pareto_tradeoff.py` - Optimización
-5. `grafico_5_comparacion_metodos_numericos.py` - Validación matemática
-6. `grafico_6_area_bajo_curva.py` - Análisis integral principal
-
-O simplemente:
-```bash
-python generar_todos_graficos.py
-```
-
----
-
-## [NOTE] Notas Adicionales
+## Notas Técnicas
 
 ### Reproducibilidad
-Todos los scripts usan semilla aleatoria fija (`SEMILLA_ALEATORIA = 42` en `config.py`) para garantizar resultados reproducibles.
+Los scripts generan resultados determinísticos. No hay aleatoriedad.
 
-### Formatos de Salida
-Por defecto, cada gráfico se guarda en:
-- PNG (alta resolución, 300 DPI)
-- PDF (vectorial, ideal para publicaciones)
-
-Configurar en `config.py`:
-```python
-FORMATOS_EXPORTACION = ['png', 'pdf', 'svg']  # Añadir SVG
-```
+### Formato de Salida
+Todos los gráficos se guardan como PNG (300 DPI) en `../figuras/resultados/`.
 
 ### Rendimiento
-Todos los scripts se ejecutan en <5 segundos en hardware moderno. El script completo (`generar_todos_graficos.py`) tarda ~20-30 segundos.
+- `rectangulos.py`: ~2 segundos
+- `rectangulos_visualizacion.py`: ~15 segundos (27 gráficos)
+- `comparativa_modelos.py`: ~12 segundos (18 gráficos)
+- **Total análisis completo**: ~30 segundos
 
 ---
 
 ## Contribuciones
 
-Para extender los análisis:
+Para extender el proyecto:
 
-1. Crear nuevo script `grafico_X_nombre.py`
-2. Importar `config.py` para parámetros
-3. Seguir estructura de funciones existentes:
-   - `crear_grafico_X()`: Genera figura
-   - `guardar_grafico()`: Exporta archivos
-   - `main()`: Función principal
-
-4. Añadir al `generar_todos_graficos.py`:
-```python
-SCRIPTS = [
-    # ... scripts existentes
-    'grafico_X_nombre.py',
-]
-```
+1. Modificar parámetros en scripts individuales
+2. Añadir nuevos modos al método `rectangulos()`
+3. Incluir más modelos de IA en la lista `MODELOS`
+4. Crear nuevas visualizaciones siguiendo el patrón existente
 
 ---
 
-## Soporte
-
-Para problemas o preguntas:
-1. Revisar esta documentación
-2. Verificar configuración en `config.py`
-3. Ejecutar scripts individualmente para aislar errores
-
----
-
-## Licencia
-
-Scripts desarrollados como parte del proyecto académico "Análisis Energético de Modelos de IA con Cálculo Integral".
-
-Código abierto para fines educativos y de investigación.
-
----
-
-**Última actualización**: Octubre 2025
-**Versión**: 1.0
-**Autor**: Proyecto Energía AI
+**Última actualización**: Noviembre 2025  
+**Versión**: 2.0.0  
+**Proyecto**: Análisis Energético con Método de Rectángulos
