@@ -554,5 +554,5 @@ Para preguntas o colaboraciones, por favor abrir un issue en el repositorio.
 
 ---
 
-**Última actualización:** Octubre 2025  
-**Versión:** 1.0.0
+**Última actualización:** Noviembre 2025  
+**Versión:** 1.0.3
