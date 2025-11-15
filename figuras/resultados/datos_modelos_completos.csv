@@ -1,6 +1,0 @@
-Modelo,Nombre_Corto,Parametros_B,Tokens_por_Segundo,Latencia_s,Potencia_GPU_W,RAM_Usada_GiB,VRAM_Usada_GiB,Energia_Total_Wh,Eficiencia_tokens_Wh
-Phi-3 Mini,Phi-3,3.8,23.4,0.42,96,14.2,4.9,14.8,948.6486486486486
-LLaMA-3 8B,LLaMA-3,8.0,17.1,0.68,110,16.8,5.6,18.3,560.655737704918
-Mistral-7B,Mistral,7.0,19.8,0.59,104,15.9,5.3,16.9,702.9585798816569
-Gemma-2B,Gemma,2.0,31.2,0.37,88,12.3,4.1,13.2,1418.1818181818182
-TinyLLaMA,TinyLLaMA,1.1,38.9,0.31,82,10.8,3.8,11.7,1994.871794871795

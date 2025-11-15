@@ -1,14 +1,30 @@
 \section{Introducción}
 
-La adopción masiva de modelos de inteligencia artificial generativa (LLMs) ha impulsado un crecimiento acelerado en la demanda energética de los centros de datos. Estos modelos requieren grandes volúmenes de potencia de computo tanto en la fase de entrenamiento como en la etapa de inferencia o uso, lo que genera preocupaciones por el consumo eléctrico, el impacto ambiental y los costos de operación asociados a estas optimizaciones.
+La adopción masiva de modelos de inteligencia artificial generativa (LLMs) ha impulsado un crecimiento acelerado en la demanda energética de los centros de datos. Estos modelos requieren grandes volúmenes de potencia de cómputo tanto en la fase de entrenamiento como en la etapa de inferencia o uso, lo que genera preocupaciones por el consumo eléctrico, el impacto ambiental y los costos de operación asociados a estas infraestructuras.
 
 El consumo energético de la inteligencia artificial se distribuye en dos componentes principales: (a) la energía requerida para entrenar modelos de gran escala, y (b) la energía demandada en la operación continua de inferencia. Este último componente —la fase de producción— resulta especialmente relevante debido a su carácter constante y global.
 
-Debido al exito de los modelos de inteligencia artificial generativa hemos visto cómo no sólo nuestras vidas se han visto rodeadas de éstas tecnologías, siendo el modelo de lenguaje más popular \textit{ChatGPT}.
-Esto tiene impactos interesantes, porque muchas personas que suelen ser vistas como el usuario promedio únicamente usan \textit{ChatGPT}, porque es el único modelo de lenguaje que conocen. Muchas veces estos mismos usuarios son los que más impacto tienen, porque no saben cómo funcionan estos modelos y se pasan todo el día charlando con ellos o generando imágenes sin ningún control. 
+Debido al éxito de los modelos de inteligencia artificial generativa, hemos visto cómo nuestras vidas se han visto rodeadas de estas tecnologías, siendo el modelo de lenguaje más popular \textit{ChatGPT}. Esto tiene impactos interesantes, porque muchas personas que suelen ser vistas como el usuario promedio únicamente usan \textit{ChatGPT}, al ser el único modelo de lenguaje que conocen. Muchas veces estos mismos usuarios son los que más impacto tienen, porque no saben cómo funcionan estos modelos y se pasan todo el día charlando con ellos o generando imágenes sin ningún control.
 
-Por la contra parte tenemos a los usuarios más avanzados y tecnológicos que saben muy bien cómo estas redes neuronales operan, y son conscientes del impacto que tienen sus peticiones, y por ende hacen un uso más racional de estas tecnologías.
+Por el contrario, tenemos a los usuarios más avanzados y tecnológicos que saben muy bien cómo estas redes neuronales operan, y son conscientes del impacto que tienen sus peticiones, haciendo un uso más racional de estas tecnologías.
+
+\subsection{Enfoque Metodológico del Proyecto}
+
+Este trabajo aborda el problema de cuantificar el consumo energético de modelos de IA mediante técnicas de \textbf{integración numérica}, específicamente el \textbf{método de rectángulos} o Sumas de Riemann. A diferencia de métodos más sofisticados como la Regla del Trapecio o Simpson 1/3, el método de rectángulos ofrece:
+
+\begin{itemize}
+\item \textbf{Simplicidad conceptual}: Fácil de comprender e implementar, ideal para análisis pedagógicos y prototipos rápidos.
+\item \textbf{Versatilidad}: Tres modos de aproximación (extremo izquierdo, punto medio, extremo derecho) que permiten cuantificar sesgos direccionales.
+\item \textbf{Convergencia verificable}: El modo punto medio (\textit{mid}) alcanza convergencia $O(h^2)$, comparable a métodos tradicionales para densidades moderadas.
+\item \textbf{Transparencia visual}: Las gráficas con rectángulos transparentes superpuestos a la curva proporcionan intuición geométrica directa del proceso de aproximación.
+\end{itemize}
+
+Se evaluaron cinco modelos representativos del ecosistema actual de LLMs: TinyLLaMA-1.1B, Gemma-2B, Phi-3 Mini, Mistral-7B y LLaMA-3 8B, cubriendo un rango de $1.1$ a $8.0$ mil millones de parámetros. Para cada modelo, se calculó numéricamente el área bajo la curva de consumo energético $E(N)$ usando tres densidades de rectángulos ($n=10, 100, 1000$), permitiendo analizar la relación entre precisión computacional y costo algorítmico.
+
+Los resultados demuestran que el método de rectángulos, especialmente en modo punto medio, alcanza precisiones de $0.0045\%$ con solo $n=100$ subintervalos, validando su aplicabilidad práctica para análisis de consumo energético en sistemas de IA.
+
+\subsection{Contexto y Relevancia}
 
 Conviene hacer una aclaración para concluir esta introducción: pese a las preocupaciones sobre su huella energética, las tecnologías digitales —incluida la inteligencia artificial— siguen siendo más limpias que muchas actividades industriales tradicionales.
 
-Sectores como el automotriz, el alimentario o el de la moda generan impactos ambientales mucho más visibles y persistentes, desde emisiones de CO$_2$ hasta contaminación por desechos o procesos químicos. En este documento me centraré en comprender los costos energéticos de la IA y propondré nuevas maneras sencillas de calcular los costos e impactos, con el propósito de dimensionar de forma más justa su verdadero impacto.
+Sectores como el automotriz, el alimentario o el de la moda generan impactos ambientales mucho más visibles y persistentes, desde emisiones de CO$_2$ hasta contaminación por desechos o procesos químicos. En este documento me centraré en comprender los costos energéticos de la IA mediante herramientas de cálculo integral, proponiendo métodos numéricos sencillos pero rigurosos para calcular consumos acumulados y dimensionar de forma más justa su verdadero impacto.

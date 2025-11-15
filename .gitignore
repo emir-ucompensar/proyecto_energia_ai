@@ -498,3 +498,21 @@ htmlcov/
 
 # Permitir archivos .gitkeep para mantener carpetas vacias
 !.gitkeep
+
+# =============================================================================
+# RECURSOS
+# =============================================================================
+
+recursos/
+recursos/*.md
+recursos/*.txt
+recursos/*.csv
+recursos/*.json
+recursos/*.xml
+recursos/*.html
+recursos/*.css
+recursos/*.js
+recursos/*.php
+recursos/*.py
+recursos/*.rb
+recursos/*.java
